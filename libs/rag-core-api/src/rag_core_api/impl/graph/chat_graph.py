@@ -281,3 +281,6 @@ class DefaultChatGraph(GraphBase):
         )
         self._state_graph.add_edge(GraphNodeNames.GENERATE, END)
         self._state_graph.add_edge(GraphNodeNames.ERROR_NODE, END)
+
+    def _wire(self) -> bool:
+        return True

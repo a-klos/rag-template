@@ -24,7 +24,7 @@ backend:
       repository: ghcr.io/stackitcloud/rag-template
       name: rag-mcp
       pullPolicy: Always
-      tag: "v1.0.0"
+      tag: "v1.0.1"
 
   name: backend
   replicaCount: 1
