@@ -175,12 +175,11 @@ jobs:
       - name: build-and-push-${{ matrix.service.name }}
         run: |
           docker build \
-            --build-arg ${{ matrix.service.build-args }} \
             --tag ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:v${{ needs.semantic-release.outputs.new-release-version }} \
             --tag ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:latest \
             --file ${{ matrix.service.dockerfile }} \
             .
-          
+
           docker push ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:v${{ needs.semantic-release.outputs.new-release-version }}
           docker push ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:latest
 
