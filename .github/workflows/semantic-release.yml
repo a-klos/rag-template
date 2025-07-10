@@ -165,9 +165,6 @@ jobs:
           fetch-depth: 0
           submodules: false
 
-      - name: setup-docker-buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: login-to-github-container-registry
         uses: docker/login-action@v3
         with:
@@ -176,18 +173,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build-and-push-${{ matrix.service.name }}
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ${{ matrix.service.dockerfile }}
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:v${{ needs.semantic-release.outputs.new-release-version }}
-            ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:latest
-          platforms: linux/amd64
-          build-args: ${{ matrix.service.build-args }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker build \
+            --build-arg ${{ matrix.service.build-args }} \
+            --tag ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:v${{ needs.semantic-release.outputs.new-release-version }} \
+            --tag ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:latest \
+            --file ${{ matrix.service.dockerfile }} \
+            .
+          
+          docker push ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:v${{ needs.semantic-release.outputs.new-release-version }}
+          docker push ghcr.io/${{ github.repository_owner }}/rag-template/${{ matrix.service.image }}:latest
 
       - name: deployment-summary
         if: strategy.job-index == 0  # Only run on first job in matrix
