@@ -48,11 +48,38 @@ jobs:
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: |
+          # Run semantic-release and capture the output
+          npx semantic-release > semantic-release-output.txt 2>&1 || true
+          
+          # Display the output
+          cat semantic-release-output.txt
+          
+          # Check if a new release was published by looking for the success message
+          if grep -q "Published release" semantic-release-output.txt; then
+            echo "new-release-published=true" >> $GITHUB_OUTPUT
+            
+            # Extract the version from the output
+            VERSION=$(grep "Published release" semantic-release-output.txt | sed -n 's/.*Published release \([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p')
+            
+            if [[ -n "$VERSION" ]]; then
+              echo "new-release-version=$VERSION" >> $GITHUB_OUTPUT
+              echo "✅ New release published: $VERSION"
+            else
+              echo "❌ Could not extract version from semantic-release output"
+              exit 1
+            fi
+          else
+            echo "new-release-published=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  No new release published"
+          fi
 
       - name: update-helm-values
         if: steps.semantic-release.outputs.new-release-published == 'true'
         run: |
+          echo "🔍 Debug: new-release-published = ${{ steps.semantic-release.outputs.new-release-published }}"
+          echo "🔍 Debug: new-release-version = ${{ steps.semantic-release.outputs.new-release-version }}"
+          
           NEW_VERSION="${{ steps.semantic-release.outputs.new-release-version }}"
 
           # Validate version format
@@ -64,7 +91,6 @@ jobs:
           VALUES_FILE="infrastructure/rag/values.yaml"
 
           # Update Helm values using Python script
-          pip install ruamel.yaml
           python3 scripts/update-helm-values.py "$NEW_VERSION"
 
           # Show git diff for verification
@@ -78,12 +104,21 @@ jobs:
       - name: commit-helm-changes
         if: steps.semantic-release.outputs.new-release-published == 'true'
         run: |
-          # Stage the Helm values changes
-          git add infrastructure/rag/values.yaml
-
-          # Amend the semantic release commit to include Helm chart updates
-          # This avoids creating an extra commit in the main branch
-          git commit --amend --no-edit || echo "No changes to commit"
+          # Check if there are changes to commit
+          if ! git diff --quiet infrastructure/rag/values.yaml; then
+            echo "📝 Committing Helm values changes..."
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add infrastructure/rag/values.yaml
+            
+            # Create a new commit for the Helm changes (don't amend since semantic-release already pushed)
+            git commit -m "chore: update helm chart image tags to v${{ steps.semantic-release.outputs.new-release-version }}"
+            git push
+            
+            echo "✅ Helm chart changes committed and pushed"
+          else
+            echo "ℹ️  No Helm chart changes to commit"
+          fi
 
   build-and-push-images:
     name: build-and-push-images
@@ -118,6 +153,11 @@ jobs:
             image: admin-frontend
             build-args: ""
     steps:
+      - name: debug-job-inputs
+        run: |
+          echo "🔍 Debug: needs.semantic-release.outputs.new-release-published = ${{ needs.semantic-release.outputs.new-release-published }}"
+          echo "🔍 Debug: needs.semantic-release.outputs.new-release-version = ${{ needs.semantic-release.outputs.new-release-version }}"
+          
       - name: checkout
         uses: actions/checkout@v4
         with:
