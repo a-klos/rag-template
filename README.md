@@ -17,8 +17,42 @@ Welcome to the STACKIT RAG Template! This is a basic example of how to use the R
 
 **Security**: Basic authentication for secure access.
 
-**Deployment**: Options for both local and production
-environments.
+**Deployment**: Options for both local and production environments with automated CI/CD.
+
+**Automated Deployment**: Semantic versioning with automatic Docker builds and Helm chart updates.
+
+## 🚀 Quick Deployment
+
+This template includes an automated deployment pipeline that:
+
+- **Builds** all 6 services (rag-backend, admin-backend, document-extractor, mcp-server, frontend, admin-frontend) automatically
+- **Pushes** Docker images to GitHub Container Registry
+- **Updates** Helm charts with new version tags
+- **Ensures** deployments are always up-to-date
+
+### Triggering a Release
+
+1. Use conventional commits (e.g., `feat:`, `fix:`, `chore:`)
+2. Trigger the semantic release workflow from GitHub Actions
+3. All services will be built and deployed automatically
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for detailed deployment documentation.
+
+### Local Testing
+
+Test all service builds locally:
+
+```bash
+# Build all services
+./scripts/local-build.sh
+
+# Build and run basic tests
+./scripts/local-build.sh --test
+
+# Build and push to registry
+./scripts/local-build.sh --push
+```
+
 
 The template supports multiple LLM (Large Language Model) providers, such as STACKIT and Ollama, giving you flexibility in choosing the best fit for your project. It also integrates with Langfuse for enhanced monitoring and analytics, and uses S3 object storage for document management. 📁
 
