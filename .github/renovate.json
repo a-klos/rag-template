@@ -13,7 +13,6 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Dashboard",
   "suppressNotifications": ["prIgnoreNotification"],
-  "repositories": ["a-klos/rag-template"],
   "packageRules": [
     {
       "description": "Group all non-major updates together",
