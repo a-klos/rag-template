@@ -1,18 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "timezone": "UTC",
-  "schedule": ["before 4am"],
-  "labels": ["dependencies"],
-  "assigneesFromCodeOwners": true,
-  "reviewersFromCodeOwners": true,
+  "labels": ["renovate"],
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
-  "rebaseWhen": "conflicted",
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Dependency Dashboard",
-  "suppressNotifications": ["prIgnoreNotification"],
+  "repositories": ["a-klos/rag-template"],
   "packageRules": [
     {
       "description": "Group all non-major updates together",
@@ -97,8 +90,5 @@
     "**/venv/**",
     "**/.venv/**"
   ],
-
-  "prConcurrentLimit": 20,
   "prHourlyLimit": 10,
-  "branchConcurrentLimit": 30
 }
