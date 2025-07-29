@@ -1,6 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "autodiscover": true,
   "extends": ["config:recommended"],
   "timezone": "UTC",
   "schedule": ["before 4am"],
@@ -14,7 +13,7 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Dependency Dashboard",
   "suppressNotifications": ["prIgnoreNotification"],
-
+  "repositories": ["a-klos/rag-template"],
   "packageRules": [
     {
       "description": "Group all non-major updates together",
@@ -35,7 +34,7 @@
     },
     {
       "description": "Python dependencies",
-      "matchManagers": ["poetry", "pip_requirements", "pip_setup"],
+      "matchManagers": ["poetry", "pip_requirements"],
       "addLabels": ["python"]
     },
     {
@@ -50,7 +49,7 @@
     },
     {
       "description": "Helm charts",
-      "matchManagers": ["helm-requirements", "helm-values"],
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3",],
       "addLabels": ["helm"]
     },
     {
@@ -100,7 +99,7 @@
     "**/.venv/**"
   ],
 
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
-  "branchConcurrentLimit": 10
+  "prConcurrentLimit": 20,
+  "prHourlyLimit": 10,
+  "branchConcurrentLimit": 30
 }
