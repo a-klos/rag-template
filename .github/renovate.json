@@ -49,7 +49,7 @@
     },
     {
       "description": "Helm charts",
-      "matchManagers": ["helm-requirements", "helm-values", "helmv3",],
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
       "addLabels": ["helm"]
     },
     {
