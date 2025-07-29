@@ -90,5 +90,5 @@
     "**/venv/**",
     "**/.venv/**"
   ],
-  "prHourlyLimit": 10,
+  "prHourlyLimit": 10
 }
