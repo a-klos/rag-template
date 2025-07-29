@@ -1,0 +1,105 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "UTC",
+  "schedule": ["before 4am"],
+  "labels": ["dependencies"],
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "rebaseWhen": "conflicted",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency Dashboard",
+  "suppressNotifications": ["prIgnoreNotification"],
+
+  "packageRules": [
+    {
+      "description": "Group all non-major updates together",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Automerge non-major updates",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Major updates require manual review",
+      "matchUpdateTypes": ["major"],
+      "labels": ["major-update"],
+      "automerge": false
+    },
+    {
+      "description": "Python dependencies",
+      "matchManagers": ["poetry", "pip_requirements", "pip_setup"],
+      "addLabels": ["python"]
+    },
+    {
+      "description": "Node.js dependencies",
+      "matchManagers": ["npm"],
+      "addLabels": ["nodejs"]
+    },
+    {
+      "description": "Docker images",
+      "matchManagers": ["docker-compose", "dockerfile"],
+      "addLabels": ["docker"]
+    },
+    {
+      "description": "Helm charts",
+      "matchManagers": ["helm-requirements", "helm-values"],
+      "addLabels": ["helm"]
+    },
+    {
+      "description": "Kubernetes manifests",
+      "matchManagers": ["kubernetes"],
+      "addLabels": ["kubernetes"]
+    },
+    {
+      "description": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "addLabels": ["github-actions"],
+      "automerge": true
+    }
+  ],
+
+  "customManagers": [
+    {
+      "description": "Update Helm chart versions in shell scripts",
+      "customType": "regex",
+      "fileMatch": ["\\.sh$"],
+      "matchStrings": [
+        "helm install .* --version \"(?<currentValue>.*?)\"",
+        "helm upgrade .* --version \"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "helm",
+      "depNameTemplate": "bitnami/nginx-ingress-controller"
+    },
+    {
+      "description": "Update Docker image versions in Dockerfiles and scripts",
+      "customType": "regex",
+      "fileMatch": ["(^|/)Dockerfile$", "\\.sh$"],
+      "matchStrings": [
+        "FROM (?<depName>.*?):(?<currentValue>.*?)@sha256:",
+        "FROM (?<depName>.*?):(?<currentValue>.*?)\\s",
+        "docker.*(?<depName>[a-z0-9.-]+/[a-z0-9.-]+):(?<currentValue>[a-z0-9.-]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+
+  "ignoreDeps": [],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/__pycache__/**",
+    "**/venv/**",
+    "**/.venv/**"
+  ],
+
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "branchConcurrentLimit": 10
+}
