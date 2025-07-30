@@ -4,8 +4,6 @@
   "timezone": "UTC",
   "schedule": ["before 4am"],
   "labels": ["dependencies"],
-  "assigneesFromCodeOwners": true,
-  "reviewersFromCodeOwners": true,
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
