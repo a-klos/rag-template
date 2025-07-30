@@ -1,7 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "labels": ["renovate"],
+  "timezone": "UTC",
+  "schedule": ["before 4am"],
+  "labels": ["dependencies"],
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
@@ -37,18 +41,7 @@
 
   "packageRules": [
     {
-      "description": "Configure Helm registries",
-      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
-      "registryUrls": [
-        "https://charts.bitnami.com/bitnami",
-        "https://langfuse.github.io/langfuse-k8s",
-        "https://qdrant.github.io/qdrant-helm",
-        "https://enapter.github.io/charts/",
-        "https://otwld.github.io/ollama-helm/"
-      ]
-    },
-    {
-      "description": "Group all non-major updates",
+      "description": "Group all non-major updates together",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
