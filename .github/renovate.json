@@ -9,6 +9,8 @@
   "prHourlyLimit": 20,
   "stabilityDays": 2,
 
+  "repositories": ["a-klos/rag-template"],
+
   "packageRules": [
     {
       "description": "Group all non-major updates",
