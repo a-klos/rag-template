@@ -5,10 +5,20 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
-    "prConcurrentLimit": 5,
+  "prConcurrentLimit": 5,
   "prHourlyLimit": 20,
   "stabilityDays": 2,
+
+  "docker": {
+    "allowedRegistries": ["docker.io", "ghcr.io"]
+  },
+
+  "helm": {
+    "registryUrls": ["https://charts.bitnami.com/bitnami"]
+  },
+
   "repositories": ["a-klos/rag-template"],
+
   "packageRules": [
     {
       "description": "Group all non-major updates together",
@@ -57,6 +67,14 @@
       "matchManagers": ["github-actions"],
       "addLabels": ["github-actions"],
       "automerge": true
+    },
+    {
+      "description": "Ignore malformed platform‑prefixed packages",
+      "matchPackageNames": [
+        "--platform=linux/amd64 python",
+        "--platform=linux/amd64 node"
+      ],
+      "enabled": false
     }
   ],
 
