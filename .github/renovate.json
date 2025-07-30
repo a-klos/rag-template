@@ -11,6 +11,7 @@
   "semanticCommitScope": "deps",
   "prConcurrentLimit": 5,
   "prHourlyLimit": 100,
+  "stabilityDays": 7,
   "repositories": ["a-klos/rag-template"],
   "hostRules": [
     {
