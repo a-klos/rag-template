@@ -10,7 +10,7 @@
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
   "prConcurrentLimit": 5,
-  "prHourlyLimit": 20,
+  "prHourlyLimit": 100,
   "repositories": ["a-klos/rag-template"],
   "hostRules": [
     {
