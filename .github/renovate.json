@@ -9,24 +9,14 @@
   "prHourlyLimit": 20,
   "stabilityDays": 2,
 
-  // Authenticate private registries
-  "hostRules": [
-    {
-      "hostType": "docker",
-      "matchHost": "ghcr.io",
-      "username": "${{GHCR_USER}}",
-      "password": "${{GHCR_TOKEN}}"
-    }
-  ],
-
-  // Allow Docker Hub and GHCR
+  // Configure allowed Docker registries (root-level)
   "docker": {
     "allowedRegistries": ["docker.io", "ghcr.io"]
   },
 
   "packageRules": [
     {
-      "description": "Group all non-major updates together",
+      "description": "Group all non-major updates",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
@@ -37,44 +27,44 @@
       "automerge": true
     },
     {
-      "description": "Major updates require manual review",
+      "description": "Require manual review for major updates",
       "matchUpdateTypes": ["major"],
       "labels": ["major-update"],
       "automerge": false
     },
     {
-      "description": "Python dependencies",
+      "description": "Label Python dependencies",
       "matchManagers": ["poetry", "pip_requirements"],
       "addLabels": ["python"]
     },
     {
-      "description": "Node.js dependencies",
+      "description": "Label Node.js dependencies",
       "matchManagers": ["npm"],
       "addLabels": ["nodejs"]
     },
     {
-      "description": "Docker images",
+      "description": "Label Docker images",
       "matchManagers": ["dockerfile", "docker-compose"],
       "addLabels": ["docker"]
     },
     {
-      "description": "Helm charts",
+      "description": "Label Helm charts",
       "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
       "addLabels": ["helm"]
     },
     {
-      "description": "Kubernetes manifests",
+      "description": "Label Kubernetes manifests",
       "matchManagers": ["kubernetes"],
       "addLabels": ["kubernetes"]
     },
     {
-      "description": "GitHub Actions",
+      "description": "Automerge GitHub Actions updates",
       "matchManagers": ["github-actions"],
       "addLabels": ["github-actions"],
       "automerge": true
     },
     {
-      "description": "Ignore malformed platform‑prefixed packages",
+      "description": "Ignore malformed platform flags",
       "matchPackageNames": [
         "--platform=linux/amd64 python",
         "--platform=linux/amd64 node"
@@ -85,7 +75,7 @@
 
   "customManagers": [
     {
-      "description": "Update Helm chart versions in shell scripts",
+      "description": "Update Helm chart versions in scripts",
       "customType": "regex",
       "fileMatch": ["\\.sh$"],
       "matchStrings": [
@@ -96,13 +86,13 @@
       "depNameTemplate": "bitnami/nginx-ingress-controller"
     },
     {
-      "description": "Update Docker image versions in Dockerfiles and scripts",
+      "description": "Update Docker image tags in Dockerfiles/scripts",
       "customType": "regex",
       "fileMatch": ["(^|/)Dockerfile$", "\\.sh$"],
       "matchStrings": [
-        "FROM (?<depName>.*?):(?<currentValue>.*?)@sha256:",
-        "FROM (?<depName>.*?):(?<currentValue>.*?)\\s",
-        "docker.*(?<depName>[a-z0-9.-]+/[a-z0-9.-]+):(?<currentValue>[a-z0-9.-]+)"
+        "FROM (?<depName>[^ :]+):(?<currentValue>[^@\\s]+)@sha256:",
+        "FROM (?<depName>[^ :]+):(?<currentValue>[^@\\s]+)\\s",
+        "docker.*(?<depName>[a-z0-9._-]+/[a-z0-9._-]+):(?<currentValue>[a-z0-9._-]+)"
       ],
       "datasourceTemplate": "docker"
     }
