@@ -7,9 +7,26 @@
   "semanticCommitScope": "deps",
   "prConcurrentLimit": 5,
   "prHourlyLimit": 20,
-  "stabilityDays": 2,
-
   "repositories": ["a-klos/rag-template"],
+
+  "hostRules": [
+    {
+      "hostType": "docker",
+      "matchHost": "ghcr.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "charts.bitnami.com"
+    }
+  ],
+
+  "docker": {
+    "allowedRegistries": ["docker.io", "ghcr.io"]
+  },
+
+  "helm": {
+    "registryUrls": ["https://charts.bitnami.com/bitnami"]
+  },
 
   "packageRules": [
     {
