@@ -9,15 +9,20 @@
   "prHourlyLimit": 20,
   "stabilityDays": 2,
 
+  // Authenticate private registries
+  "hostRules": [
+    {
+      "hostType": "docker",
+      "matchHost": "ghcr.io",
+      "username": "${{GHCR_USER}}",
+      "password": "${{GHCR_TOKEN}}"
+    }
+  ],
+
+  // Allow Docker Hub and GHCR
   "docker": {
     "allowedRegistries": ["docker.io", "ghcr.io"]
   },
-
-  "helm": {
-    "registryUrls": ["https://charts.bitnami.com/bitnami"]
-  },
-
-  "repositories": ["a-klos/rag-template"],
 
   "packageRules": [
     {
@@ -49,7 +54,7 @@
     },
     {
       "description": "Docker images",
-      "matchManagers": ["docker-compose", "dockerfile"],
+      "matchManagers": ["dockerfile", "docker-compose"],
       "addLabels": ["docker"]
     },
     {
