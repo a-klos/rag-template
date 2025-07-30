@@ -9,11 +9,6 @@
   "prHourlyLimit": 20,
   "stabilityDays": 2,
 
-  // Configure allowed Docker registries (root-level)
-  "docker": {
-    "allowedRegistries": ["docker.io", "ghcr.io"]
-  },
-
   "packageRules": [
     {
       "description": "Group all non-major updates",
