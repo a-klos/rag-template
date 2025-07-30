@@ -5,6 +5,9 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
+    "prConcurrentLimit": 5,
+  "prHourlyLimit": 20,
+  "stabilityDays": 2,
   "repositories": ["a-klos/rag-template"],
   "packageRules": [
     {
@@ -90,5 +93,4 @@
     "**/venv/**",
     "**/.venv/**"
   ],
-  "prHourlyLimit": 100
 }
