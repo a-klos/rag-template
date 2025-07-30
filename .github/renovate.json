@@ -8,7 +8,6 @@
   "prConcurrentLimit": 5,
   "prHourlyLimit": 20,
   "repositories": ["a-klos/rag-template"],
-
   "hostRules": [
     {
       "hostType": "docker",
@@ -19,16 +18,17 @@
       "matchHost": "charts.bitnami.com"
     }
   ],
-
-  "docker": {
-    "allowedRegistries": ["docker.io", "ghcr.io"]
-  },
-
-  "helm": {
-    "registryUrls": ["https://charts.bitnami.com/bitnami"]
-  },
-
   "packageRules": [
+    {
+      "description": "Configure Helm registries",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "registryUrls": ["https://charts.bitnami.com/bitnami"]
+    },
+    {
+      "description": "Configure allowed Docker registries",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "allowedRegistries": ["docker.io", "ghcr.io"]
+    },
     {
       "description": "Group all non-major updates",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
@@ -86,7 +86,6 @@
       "enabled": false
     }
   ],
-
   "customManagers": [
     {
       "description": "Update Helm chart versions in scripts",
@@ -111,7 +110,6 @@
       "datasourceTemplate": "docker"
     }
   ],
-
   "ignoreDeps": [],
   "ignorePaths": [
     "**/node_modules/**",
