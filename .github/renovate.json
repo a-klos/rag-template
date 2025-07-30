@@ -104,9 +104,34 @@
       "enabled": false
     },
     {
-      "description": "Bitnami nginx-ingress-controller",
-      "matchPackageNames": ["bitnami/nginx-ingress-controller"],
+      "description": "Bitnami Helm charts",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "matchPackageNames": ["minio", "bitnami/nginx-ingress-controller"],
       "registryUrls": ["https://charts.bitnami.com/bitnami"]
+    },
+    {
+      "description": "Langfuse Helm chart",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "matchPackageNames": ["langfuse"],
+      "registryUrls": ["https://langfuse.github.io/langfuse-k8s"]
+    },
+    {
+      "description": "Qdrant Helm chart",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "matchPackageNames": ["qdrant"],
+      "registryUrls": ["https://qdrant.github.io/qdrant-helm"]
+    },
+    {
+      "description": "KeyDB Helm chart",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "matchPackageNames": ["keydb"],
+      "registryUrls": ["https://enapter.github.io/charts/"]
+    },
+    {
+      "description": "Ollama Helm chart",
+      "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
+      "matchPackageNames": ["ollama"],
+      "registryUrls": ["https://otwld.github.io/ollama-helm/"]
     }
   ],
   "customManagers": [
