@@ -18,16 +18,14 @@
       "matchHost": "charts.bitnami.com"
     }
   ],
+  "docker": {
+    "allowedRegistries": ["docker.io", "ghcr.io"]
+  },
   "packageRules": [
     {
       "description": "Configure Helm registries",
       "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
       "registryUrls": ["https://charts.bitnami.com/bitnami"]
-    },
-    {
-      "description": "Configure allowed Docker registries",
-      "matchManagers": ["dockerfile", "docker-compose"],
-      "allowedRegistries": ["docker.io", "ghcr.io"]
     },
     {
       "description": "Group all non-major updates",
