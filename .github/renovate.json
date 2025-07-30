@@ -16,6 +16,22 @@
     {
       "hostType": "helm",
       "matchHost": "charts.bitnami.com"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "langfuse.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "qdrant.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "enapter.github.io"
+    },
+    {
+      "hostType": "helm",
+      "matchHost": "otwld.github.io"
     }
   ],
 
@@ -23,7 +39,13 @@
     {
       "description": "Configure Helm registries",
       "matchManagers": ["helm-requirements", "helm-values", "helmv3"],
-      "registryUrls": ["https://charts.bitnami.com/bitnami"]
+      "registryUrls": [
+        "https://charts.bitnami.com/bitnami",
+        "https://langfuse.github.io/langfuse-k8s",
+        "https://qdrant.github.io/qdrant-helm",
+        "https://enapter.github.io/charts/",
+        "https://otwld.github.io/ollama-helm/"
+      ]
     },
     {
       "description": "Group all non-major updates",
@@ -80,6 +102,11 @@
         "--platform=linux/amd64 node"
       ],
       "enabled": false
+    },
+    {
+      "description": "Bitnami nginx-ingress-controller",
+      "matchPackageNames": ["bitnami/nginx-ingress-controller"],
+      "registryUrls": ["https://charts.bitnami.com/bitnami"]
     }
   ],
   "customManagers": [
