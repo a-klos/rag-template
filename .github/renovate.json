@@ -18,9 +18,7 @@
       "matchHost": "charts.bitnami.com"
     }
   ],
-  "docker": {
-    "allowedRegistries": ["docker.io", "ghcr.io"]
-  },
+
   "packageRules": [
     {
       "description": "Configure Helm registries",
