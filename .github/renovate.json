@@ -149,6 +149,15 @@
         "docker.*(?<depName>[a-z0-9._-]+/[a-z0-9._-]+):(?<currentValue>[a-z0-9._-]+)"
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "description": "Update image tags in Helm values.yaml",
+      "customType": "regex",
+      "fileMatch": ["values\\.yaml$"],
+      "matchStrings": [
+        "repository:\\s*(?<depName>ghcr\\.io/stackitcloud/rag-template/[a-zA-Z0-9_-]+)\\s*pullPolicy:\\s*Always\\s*tag:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "ignoreDeps": [],
