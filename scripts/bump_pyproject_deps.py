@@ -77,9 +77,11 @@ def bump(version: str):
     for file, mapping in SERVICE_PINS.items():
         txt = file.read_text()
         doc = tomlkit.parse(txt)
+        print(doc)
         deps = _get_table(doc, [
             'tool', 'poetry', 'group', 'prod', 'dependencies'
         ])
+        print(deps)
         if deps is None:
             print(f"Skip {file}: prod dependencies table not found")
             continue
