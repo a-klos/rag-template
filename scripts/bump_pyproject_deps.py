@@ -57,9 +57,11 @@ def replace_version_line(text: str, new_version: str) -> str:
 
 
 def _get_table(doc: tomlkit.TOMLDocument, path: List[str]) -> Optional[Table]:
+    print(doc)
     ref: Any = doc
     for key in path:
         if not isinstance(ref, (tomlkit.TOMLDocument, Table)) or key not in ref:
+            print(f"Skip {doc}: {key} not found")
             return None
         ref = ref[key]
     return ref if isinstance(ref, Table) else None
@@ -77,7 +79,6 @@ def bump(version: str):
     for file, mapping in SERVICE_PINS.items():
         txt = file.read_text()
         doc = tomlkit.parse(txt)
-        print(doc)
         deps = _get_table(doc, [
             'tool', 'poetry', 'group', 'prod', 'dependencies'
         ])
