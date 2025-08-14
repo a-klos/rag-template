@@ -1,10 +1,8 @@
 name: build-images
 on:
-  workflow_dispatch: {}
-
-  workflow_run:
-    workflows: [publish-libs-on-merge]
-    types: [completed]
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -12,15 +10,26 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Run ONLY when:
+    # - the PR was merged
+    # - it was your auto-PR (branch starts with chore/refresh-locks-)
+    # - and it has the "refresh-locks" label added in action1
+    if: >-
+      ${{
+        github.event.pull_request.merged == true &&
+        startsWith(github.event.pull_request.head.ref, 'chore/refresh-locks-') &&
+        contains(github.event.pull_request.labels.*.name, 'refresh-locks')
+      }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        # Build exactly the merged commit
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Read version
         id: ver
-        run: |
-          echo "version=$(cat .version)" >> $GITHUB_OUTPUT
+        run: echo "version=$(cat .version)" >> $GITHUB_OUTPUT
 
       - name: Setup Node (for frontend context)
         uses: actions/setup-node@v4
@@ -29,8 +38,7 @@ jobs:
 
       - name: Install frontend deps (workspace cache for Docker layer cache)
         working-directory: services/frontend
-        run: |
-          npm ci || true
+        run: npm ci || true
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -50,7 +58,6 @@ jobs:
           docker buildx build --push -t ghcr.io/stackitcloud/rag-template/admin-backend:${VERSION} -f services/admin-backend/Dockerfile .
           docker buildx build --push -t ghcr.io/stackitcloud/rag-template/document-extractor:${VERSION} -f services/document-extractor/Dockerfile .
           docker buildx build --push -t ghcr.io/stackitcloud/rag-template/mcp-server:${VERSION} -f services/mcp-server/Dockerfile .
-          # Frontend apps (chat-app and admin-app)
           docker buildx build --push -t ghcr.io/stackitcloud/rag-template/frontend:${VERSION} -f services/frontend/apps/chat-app/Dockerfile .
           docker buildx build --push -t ghcr.io/stackitcloud/rag-template/admin-frontend:${VERSION} -f services/frontend/apps/admin-app/Dockerfile .
 

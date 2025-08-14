@@ -6,11 +6,10 @@ on:
     branches: [main]
     paths:
       - '.version'
-      - 'libs/**'
-      - 'services/**/pyproject.toml'
-
+      
 permissions:
   contents: write
+  pull-requests: write
   packages: write
 
 jobs:
@@ -58,12 +57,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read version
-        id: ver
-        run: |
-          VERSION=$(cat .version)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -83,17 +76,18 @@ jobs:
             fi
           done
 
-      - name: Commit updated lockfiles
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          if git diff --quiet -- services/**/poetry.lock; then
-            echo "No lockfile changes to commit"
-            exit 0
-          fi
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add services/**/poetry.lock
-          git commit -m "chore(release): refresh service lockfiles for ${{ steps.ver.outputs.version }}"
-          git push
+      - name: Open PR with updated lockfiles
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/refresh-locks-${{ github.run_number }}
+          title: "chore(release): refresh service lockfiles"
+          body: |
+            Refresh service poetry.lock files after publishing libs.
+          commit-message: "chore(release): refresh service lockfiles"
+          add-paths: |
+            services/**/poetry.lock
+          labels: refresh-locks
+
+      - name: PR URL
+        run: 'echo "PR created: ${{ steps.cpr.outputs.pull-request-url }}"'
