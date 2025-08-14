@@ -21,6 +21,9 @@ jobs:
         contains(github.event.pull_request.labels.*.name, 'refresh-locks')
       }}
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NS: ${{ github.repository_owner }}/rag-template
     steps:
       - uses: actions/checkout@v4
         # Build exactly the merged commit
@@ -54,12 +57,12 @@ jobs:
         run: |
           set -e
           VERSION="${{ steps.ver.outputs.version }}"
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/rag-backend:${VERSION} -f services/rag-backend/Dockerfile .
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/admin-backend:${VERSION} -f services/admin-backend/Dockerfile .
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/document-extractor:${VERSION} -f services/document-extractor/Dockerfile .
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/mcp-server:${VERSION} -f services/mcp-server/Dockerfile .
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/frontend:${VERSION} -f services/frontend/apps/chat-app/Dockerfile .
-          docker buildx build --push -t ghcr.io/stackitcloud/rag-template/admin-frontend:${VERSION} -f services/frontend/apps/admin-app/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/rag-backend:${VERSION}" -f services/rag-backend/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/admin-backend:${VERSION}" -f services/admin-backend/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/document-extractor:${VERSION}" -f services/document-extractor/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/mcp-server:${VERSION}" -f services/mcp-server/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/frontend:${VERSION}" -f services/frontend/apps/chat-app/Dockerfile .
+          docker buildx build --push -t "$REGISTRY/$IMAGE_NS/admin-frontend:${VERSION}" -f services/frontend/apps/admin-app/Dockerfile .
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -69,12 +72,12 @@ jobs:
           VERSION="${{ steps.ver.outputs.version }}"
           : > image-digests.json
           for ref in \
-            ghcr.io/stackitcloud/rag-template/rag-backend:${VERSION} \
-            ghcr.io/stackitcloud/rag-template/admin-backend:${VERSION} \
-            ghcr.io/stackitcloud/rag-template/document-extractor:${VERSION} \
-            ghcr.io/stackitcloud/rag-template/mcp-server:${VERSION} \
-            ghcr.io/stackitcloud/rag-template/frontend:${VERSION} \
-            ghcr.io/stackitcloud/rag-template/admin-frontend:${VERSION}
+            "$REGISTRY/$IMAGE_NS/rag-backend:${VERSION}" \
+            "$REGISTRY/$IMAGE_NS/admin-backend:${VERSION}" \
+            "$REGISTRY/$IMAGE_NS/document-extractor:${VERSION}" \
+            "$REGISTRY/$IMAGE_NS/mcp-server:${VERSION}" \
+            "$REGISTRY/$IMAGE_NS/frontend:${VERSION}" \
+            "$REGISTRY/$IMAGE_NS/admin-frontend:${VERSION}"
           do
             svc=$(basename "${ref%:*}")
             digest=$(docker buildx imagetools inspect "$ref" --format '{{json .Manifest.Digest}}' | jq -r . || true)
