@@ -9,7 +9,7 @@ from extractor_api_lib.file_services.file_service import FileService
 
 
 class InformationFileExtractor(ABC):
-    """Base class for Information file extractors."""
+    """Base class for Information file extractors."""#
 
     def __init__(self, file_service: FileService):
         """Initialize the InformationExtractor.
