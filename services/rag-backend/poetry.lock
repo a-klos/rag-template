@@ -4056,14 +4056,14 @@ fastembed-gpu = ["fastembed-gpu (>=0.7,<0.8)"]
 
 [[package]]
 name = "rag-core-api"
-version = "2.2.0"
+version = "1.0.0"
 description = "Contains default implementation for the RAG. It manages the communication with the knowledge base and how the answers are generated."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_api-2.2.0-py3-none-any.whl", hash = "sha256:e2cf800307351a3615970f06ace4f7c10851a5d3ebd7a6f6b8e674167aa549ff"},
-    {file = "rag_core_api-2.2.0.tar.gz", hash = "sha256:9e01023663897a2c27afd38635d2b496c5841d726579bb07851dc8de566d3ded"},
+    {file = "rag_core_api-1.0.0-py3-none-any.whl", hash = "sha256:5c7a62570c2aa7b0ea84b36b9860fce367dd78ef07d33d2aec50222b754210cf"},
+    {file = "rag_core_api-1.0.0.tar.gz", hash = "sha256:1fb6163de4db02ecc430eb22592289368dc5af099cffd309c02c50882f09d74e"},
 ]
 
 [package.dependencies]
@@ -4095,14 +4095,14 @@ reference = "testpypi"
 
 [[package]]
 name = "rag-core-lib"
-version = "2.2.0"
+version = "1.0.0"
 description = "The core library for the RAG. It contains shared components and utilities for the RAG libs."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_lib-2.2.0-py3-none-any.whl", hash = "sha256:af62ffa030dd6c229f1f2a04dbdef1c3d790078d08102ce3c68aab9d8c13ed0d"},
-    {file = "rag_core_lib-2.2.0.tar.gz", hash = "sha256:1596911d2f8ecbcdd0d5c3d78a0f8b006a09ddc33b7bc1a14e22ffdab756ef7f"},
+    {file = "rag_core_lib-1.0.0-py3-none-any.whl", hash = "sha256:9d78523241db94ce59bc8c739226f533f8b81ed19bae0a0e08edba80139bf713"},
+    {file = "rag_core_lib-1.0.0.tar.gz", hash = "sha256:f97d784f742c7ae5cb164ef2cb16d5a6709f6276641cef606c62859c353b7ed9"},
 ]
 
 [package.dependencies]
@@ -5226,4 +5226,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "34518692eafbb417e74fabc346c77ee81997d99a2d61eec8130c34ca4b70b4b5"
+content-hash = "742af3a071570dbc55e57fc0777ea8be9020290048f6caa27ebfa5f848dbd31f"
