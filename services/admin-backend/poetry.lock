@@ -2,14 +2,14 @@
 
 [[package]]
 name = "admin-api-lib"
-version = "1.0.0"
+version = "2.0.0"
 description = "The admin api lib is responsible for the file and source management. This includes deletion, upload and returning the source document."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "admin_api_lib-1.0.0-py3-none-any.whl", hash = "sha256:c28c4715e0fb802e9e855e94417ba0f0eb1ab8c28a0205046a2f8c5c26b4dc15"},
-    {file = "admin_api_lib-1.0.0.tar.gz", hash = "sha256:126be019300ccd8528cb20657cb26bf0215b0811ce4bd3022cd4988843df94ea"},
+    {file = "admin_api_lib-2.0.0-py3-none-any.whl", hash = "sha256:c8b335821a57abef74294c9ff5bbd82ec2a7ca6eec5ca39637081a0badc1949a"},
+    {file = "admin_api_lib-2.0.0.tar.gz", hash = "sha256:fbadf56739c95c384cec5fe30385df49bfc14e0ddfd717e00ea0cd1d5386e315"},
 ]
 
 [package.dependencies]
@@ -3173,14 +3173,14 @@ files = [
 
 [[package]]
 name = "rag-core-lib"
-version = "1.0.0"
+version = "2.0.0"
 description = "The core library for the RAG. It contains shared components and utilities for the RAG libs."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_lib-1.0.0-py3-none-any.whl", hash = "sha256:9d78523241db94ce59bc8c739226f533f8b81ed19bae0a0e08edba80139bf713"},
-    {file = "rag_core_lib-1.0.0.tar.gz", hash = "sha256:f97d784f742c7ae5cb164ef2cb16d5a6709f6276641cef606c62859c353b7ed9"},
+    {file = "rag_core_lib-2.0.0-py3-none-any.whl", hash = "sha256:ebfeb8841205f33d49492a8eb1b07b2dcf9ad77b9bde96e91bcac6e0e4256c6b"},
+    {file = "rag_core_lib-2.0.0.tar.gz", hash = "sha256:3d321c02e8e91d5c36e2304a4d9c4434055d10b875bb354747f1b3a10798b47e"},
 ]
 
 [package.dependencies]
@@ -4146,4 +4146,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "a3fdfb9bdb9cfcd72c7c405b67dce1e8f148668240e00b5340547f5bd634097f"
+content-hash = "a04fa422c3d85f7e60b958a5e59c72b11fb613b71cf1b75d37e1f21d425e3b6b"
