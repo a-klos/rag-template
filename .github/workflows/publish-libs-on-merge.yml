@@ -11,6 +11,7 @@ permissions:
   contents: write
   pull-requests: write
   packages: write
+  issues: write
 
 jobs:
   publish:
@@ -65,6 +66,31 @@ jobs:
       - name: Install Poetry
         run: |
           pip install poetry==2.1.3
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Wait for TestPyPI indexing
+        run: |
+          set -e
+          VERSION="$(cat .version)"
+          echo "Waiting for TestPyPI to index internal libs for version $VERSION"
+          for name in admin-api-lib extractor-api-lib rag-core-api rag-core-lib; do
+            echo "Checking $name==$VERSION"
+            seen=false
+            for i in $(seq 1 36); do # up to ~3 minutes
+              if curl -fsSL "https://test.pypi.org/pypi/$name/json" | jq -e --arg v "$VERSION" '.releases[$v] | length > 0' >/dev/null; then
+                echo "Found $name==$VERSION"
+                seen=true
+                break
+              fi
+              sleep 5
+            done
+            if [ "$seen" != "true" ]; then
+              echo "Error: $name==$VERSION not visible on TestPyPI yet"
+              exit 1
+            fi
+          done
 
       - name: Refresh service lockfiles
         run: |
