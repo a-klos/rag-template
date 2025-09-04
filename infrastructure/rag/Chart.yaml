@@ -9,8 +9,8 @@ description: 'This helm chart deploys a front- and backend microservice. Togethe
 
   '
 type: application
-version: 2.0.0.post20250904101937
-appVersion: 2.0.0.post20250904101937
+version: 2.0.0.post20250904102939
+appVersion: 2.0.0.post20250904102939
 dependencies:
 - name: langfuse
   repository: https://langfuse.github.io/langfuse-k8s
