@@ -113,8 +113,8 @@ jobs:
                 cd "$svc"
                 poetry lock -v || (
                   echo "Lock failed, clearing caches and retrying...";
-                  poetry cache clear --all pypi --yes || true;
-                  poetry cache clear --all testpypi --yes || true;
+                  poetry cache clear --all pypi -n || true;
+                  poetry cache clear --all testpypi -n || true;
                   sleep 10;
                   poetry lock -v
                 )
