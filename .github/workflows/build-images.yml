@@ -12,12 +12,25 @@ permissions:
 
 jobs:
   build:
+    # Run ONLY when:
+    # - the PR was merged
+    # - it was your auto-PR (branch starts with chore/refresh-locks-)
+    # - and it has the "refresh-locks" label added in action1
+    if: >-
+      ${{
+        github.event.pull_request.merged == true &&
+        startsWith(github.event.pull_request.head.ref, 'chore/refresh-locks-') &&
+        contains(github.event.pull_request.labels.*.name, 'refresh-locks')
+      }}
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
       IMAGE_NS: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
+        # Build exactly the merged commit
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Read version
         id: ver
