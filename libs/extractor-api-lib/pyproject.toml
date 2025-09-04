@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "extractor_api_lib"
-version = "2.0.0.post20250904094003"
+version = "2.0.0.post20250904101937"
 description = "Extracts the content of documents, websites, etc and maps it to a common format."
 authors = ["STACKIT Data and AI Consulting <data-ai-consulting@stackit.cloud>"]
 packages = [{ include = "extractor_api_lib", from = "src" }]
