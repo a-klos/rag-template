@@ -27,7 +27,7 @@ FROM python:3.13-bookworm
 
 WORKDIR /app/services/rag-backend
 
-RUN adduser --disabled-password --gecos "" --uid 65532 nonroot
+RUN adduser --disabled-password --gecos "" --uid 10001 nonroot
 
 ENV POETRY_VIRTUALENVS_PATH=/app/services/rag-backend/.venv
 COPY --from=build --chown=nonroot:nonroot ${POETRY_VIRTUALENVS_PATH} ${POETRY_VIRTUALENVS_PATH}

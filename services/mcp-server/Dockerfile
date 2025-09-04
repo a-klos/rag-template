@@ -25,7 +25,7 @@ FROM python:3.11.7-bookworm
 
 WORKDIR /app/services/mcp-server
 
-RUN adduser --disabled-password --gecos "" --uid 65532 nonroot
+RUN adduser --disabled-password --gecos "" --uid 10001 nonroot
 
 ENV POETRY_VIRTUALENVS_PATH=/app/services/mcp-server/.venv
 COPY --from=build --chown=nonroot:nonroot ${POETRY_VIRTUALENVS_PATH} ${POETRY_VIRTUALENVS_PATH}

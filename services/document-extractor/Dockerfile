@@ -23,7 +23,7 @@ RUN poetry config virtualenvs.create false \
 
 FROM python:3.13-bookworm
 
-RUN adduser --disabled-password --gecos "" --uid 65532 nonroot
+RUN adduser --disabled-password --gecos "" --uid 10001 nonroot
 
 ENV POETRY_VIRTUALENVS_PATH=/app/services/document-extractor/.venv
 COPY --from=build  --chown=nonroot:nonroot ${POETRY_VIRTUALENVS_PATH} ${POETRY_VIRTUALENVS_PATH}
