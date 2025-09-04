@@ -4056,14 +4056,14 @@ fastembed-gpu = ["fastembed-gpu (>=0.7,<0.8)"]
 
 [[package]]
 name = "rag-core-api"
-version = "2.0.0"
+version = "2.0.0.post20250904091815"
 description = "Contains default implementation for the RAG. It manages the communication with the knowledge base and how the answers are generated."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_api-2.0.0-py3-none-any.whl", hash = "sha256:4f2b03993db2dfbd1ef3a70d109fc9445c88c1830a66d427abb0477f2c600f11"},
-    {file = "rag_core_api-2.0.0.tar.gz", hash = "sha256:3a30e4836c1005c521b5776c90df13872a533f32de3aeeeba6cc49ace5384cf5"},
+    {file = "rag_core_api-2.0.0.post20250904091815-py3-none-any.whl", hash = "sha256:2818e17fc962f90d3966a6a701e164966d9df4655ab5c0c31edf96176db454fc"},
+    {file = "rag_core_api-2.0.0.post20250904091815.tar.gz", hash = "sha256:305da48b5a235e58c59c9b3335518a12c6ee6416e506b9216086ecafac0f2373"},
 ]
 
 [package.dependencies]
@@ -4095,14 +4095,14 @@ reference = "testpypi"
 
 [[package]]
 name = "rag-core-lib"
-version = "2.0.0"
+version = "2.0.0.post20250904091815"
 description = "The core library for the RAG. It contains shared components and utilities for the RAG libs."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_lib-2.0.0-py3-none-any.whl", hash = "sha256:ebfeb8841205f33d49492a8eb1b07b2dcf9ad77b9bde96e91bcac6e0e4256c6b"},
-    {file = "rag_core_lib-2.0.0.tar.gz", hash = "sha256:3d321c02e8e91d5c36e2304a4d9c4434055d10b875bb354747f1b3a10798b47e"},
+    {file = "rag_core_lib-2.0.0.post20250904091815-py3-none-any.whl", hash = "sha256:5af8c74692b8b34b74a4fc0845431047290e707b55821adfacc867914974c1d0"},
+    {file = "rag_core_lib-2.0.0.post20250904091815.tar.gz", hash = "sha256:9a6012947998709b92baa5e41ebb52271a778799b328f19ba31649ed869d7934"},
 ]
 
 [package.dependencies]
@@ -5226,4 +5226,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "574a176ac80f0b53bd99b906f217d56267a230e26932a26877304c19319a2854"
+content-hash = "d591dd554cebbe3031fbeb28661a63341630b11465e073e56a7c57586b30e49f"
