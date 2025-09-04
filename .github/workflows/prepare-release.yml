@@ -35,7 +35,7 @@ jobs:
           npx semantic-release --dry-run --no-ci | tee semrel.log
           BASE_VERSION=$(grep -Eo "next release version is [0-9]+\.[0-9]+\.[0-9]+" semrel.log | awk '{print $5}')
           if [ -z "$BASE_VERSION" ]; then echo "No new release required"; exit 1; fi
-          VERSION="${BASE_VERSION}-post$(date +%Y%m%d%H%M%S)"
+          VERSION="${BASE_VERSION}post$(date +%Y%m%d%H%M%S)"
           echo "$VERSION" > .version
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
