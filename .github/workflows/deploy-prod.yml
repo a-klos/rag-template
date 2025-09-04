@@ -61,7 +61,7 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          set -euo pipefail
+          set -e
           backend_ref="ghcr.io/stackitcloud/rag-template/rag-backend:${VERSION}"
           admin_ref="ghcr.io/stackitcloud/rag-template/admin-backend:${VERSION}"
           extractor_ref="ghcr.io/stackitcloud/rag-template/document-extractor:${VERSION}"
@@ -80,7 +80,7 @@ jobs:
           NAMESPACE: ${{ inputs.namespace }}
           CHART_PATH: ${{ inputs.chart_path }}
         run: |
-          set -euo pipefail
+          set -e
           helm upgrade --install "$RELEASE" "$CHART_PATH" \
             --namespace "$NAMESPACE" --create-namespace \
             --set backend.image.digest='${{ steps.digests.outputs.backend }}' \
