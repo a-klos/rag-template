@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rag-backend"
-version = "2.0.0.post20250904091049"
+version = "2.0.0.post20250904091815"
 description = ""
 authors = ["STACKIT Data and AI Consulting <data-ai-consulting@stackit.cloud>"]
 
@@ -14,8 +14,8 @@ url = "https://test.pypi.org/simple/"
 priority = "supplemental"
 
 [tool.poetry.group.prod.dependencies]
-rag-core-api = "==2.0.0.post20250904091049"
-rag-core-lib = "==2.0.0.post20250904091049"
+rag-core-api = "==2.0.0.post20250904091815"
+rag-core-lib = "==2.0.0.post20250904091815"
 
 [tool.poetry.group.dev.dependencies]
 debugpy = "^1.8.14"
