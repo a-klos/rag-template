@@ -2,10 +2,9 @@ name: build-images
 on:
   workflow_dispatch: {}
 
-  push:
+  pull_request:
+    types: [closed]
     branches: [main]
-    paths:
-      - '.version'
 
 permissions:
   contents: read
