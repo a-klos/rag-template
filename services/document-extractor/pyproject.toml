@@ -44,7 +44,7 @@ max-line-length = 120
 
 [tool.poetry]
 name = "document-extractor"
-version = "2.0.0.post20250904091049"
+version = "2.0.0.post20250904091815"
 description = "Extracts content from files and sources like Confluence spaces, sitemaps etc."
 authors = ["STACKIT Data and AI Consulting <data-ai-consulting@stackit.cloud>"]
 readme = "README.md"
@@ -59,7 +59,7 @@ url = "https://test.pypi.org/simple/"
 priority = "supplemental"
 
 [tool.poetry.group.prod.dependencies]
-extractor-api-lib = "==2.0.0.post20250904091049"
+extractor-api-lib = "==2.0.0.post20250904091815"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.2.0"
