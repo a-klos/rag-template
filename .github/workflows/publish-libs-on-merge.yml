@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - '.version'
-      
+
 permissions:
   contents: write
   pull-requests: write
@@ -48,6 +48,7 @@ jobs:
             [ -d "$lib" ] || continue
             echo "Publishing $lib"
             (cd "$lib" && poetry version "${{ steps.ver.outputs.version }}" && poetry build && poetry publish -r testpypi)
+            break  # Exit loop after first library <----------------------------------------------------------------------------DELETE LATER!!!
           done
 
   lock-services:
