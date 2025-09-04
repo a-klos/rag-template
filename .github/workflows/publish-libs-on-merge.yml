@@ -78,16 +78,27 @@ jobs:
           for name in admin-api-lib extractor-api-lib rag-core-api rag-core-lib; do
             echo "Checking $name==$VERSION"
             seen=false
-            for i in $(seq 1 36); do # up to ~3 minutes
+            for i in $(seq 1 60); do # up to ~5 minutes
+              json_ok=false
+              simple_ok=false
               if curl -fsSL "https://test.pypi.org/pypi/$name/json" | jq -e --arg v "$VERSION" '.releases[$v] | length > 0' >/dev/null; then
-                echo "Found $name==$VERSION"
+                json_ok=true
+              fi
+              # Check simple index also, Poetry resolves via /simple
+              if curl -fsSL "https://test.pypi.org/simple/$name/" | grep -q "$VERSION"; then
+                simple_ok=true
+              fi
+              if [ "$json_ok" = true ] && [ "$simple_ok" = true ]; then
+                echo "Found $name==$VERSION on JSON and /simple"
                 seen=true
                 break
               fi
               sleep 5
             done
             if [ "$seen" != "true" ]; then
-              echo "Error: $name==$VERSION not visible on TestPyPI yet"
+              echo "Error: $name==$VERSION not visible on TestPyPI JSON+simple yet"
+              echo "--- Debug /simple page for $name ---"
+              curl -fsSL "https://test.pypi.org/simple/$name/" || true
               exit 1
             fi
           done
@@ -98,7 +109,16 @@ jobs:
           for svc in services/rag-backend services/admin-backend services/document-extractor services/mcp-server; do
             if [ -f "$svc/pyproject.toml" ]; then
               echo "Locking $svc"
-              (cd "$svc" && poetry lock)
+              (
+                cd "$svc"
+                poetry lock -v || (
+                  echo "Lock failed, clearing caches and retrying...";
+                  poetry cache clear --all pypi || true;
+                  poetry cache clear --all testpypi || true;
+                  sleep 10;
+                  poetry lock -v
+                )
+              )
             fi
           done
 
