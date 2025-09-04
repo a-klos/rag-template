@@ -2,14 +2,14 @@
 
 [[package]]
 name = "admin-api-lib"
-version = "2.0.0"
+version = "2.0.0.post20250904091815"
 description = "The admin api lib is responsible for the file and source management. This includes deletion, upload and returning the source document."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "admin_api_lib-2.0.0-py3-none-any.whl", hash = "sha256:c8b335821a57abef74294c9ff5bbd82ec2a7ca6eec5ca39637081a0badc1949a"},
-    {file = "admin_api_lib-2.0.0.tar.gz", hash = "sha256:fbadf56739c95c384cec5fe30385df49bfc14e0ddfd717e00ea0cd1d5386e315"},
+    {file = "admin_api_lib-2.0.0.post20250904091815-py3-none-any.whl", hash = "sha256:e87dcfb9acd9fe2469e54b7addbac7b3bd247ebadb709d66188d6a608c499c56"},
+    {file = "admin_api_lib-2.0.0.post20250904091815.tar.gz", hash = "sha256:218b5f8b44aba22ad81bac5e4f7dea5667b0506e8b51fb78d78e81100bb0784b"},
 ]
 
 [package.dependencies]
@@ -3173,14 +3173,14 @@ files = [
 
 [[package]]
 name = "rag-core-lib"
-version = "2.0.0"
+version = "2.0.0.post20250904091815"
 description = "The core library for the RAG. It contains shared components and utilities for the RAG libs."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_lib-2.0.0-py3-none-any.whl", hash = "sha256:ebfeb8841205f33d49492a8eb1b07b2dcf9ad77b9bde96e91bcac6e0e4256c6b"},
-    {file = "rag_core_lib-2.0.0.tar.gz", hash = "sha256:3d321c02e8e91d5c36e2304a4d9c4434055d10b875bb354747f1b3a10798b47e"},
+    {file = "rag_core_lib-2.0.0.post20250904091815-py3-none-any.whl", hash = "sha256:5af8c74692b8b34b74a4fc0845431047290e707b55821adfacc867914974c1d0"},
+    {file = "rag_core_lib-2.0.0.post20250904091815.tar.gz", hash = "sha256:9a6012947998709b92baa5e41ebb52271a778799b328f19ba31649ed869d7934"},
 ]
 
 [package.dependencies]
@@ -4146,4 +4146,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "a04fa422c3d85f7e60b958a5e59c72b11fb613b71cf1b75d37e1f21d425e3b6b"
+content-hash = "e2eff61229362d3a516c56f543bf5344ba529e198ea407625a8a5a76e4dbda31"
