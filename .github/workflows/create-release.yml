@@ -23,7 +23,6 @@ jobs:
       - name: Derive version from PR title
         id: ver
         run: |
-          set -euo pipefail
           TITLE="${{ github.event.pull_request.title }}"
           VERSION=$(echo "$TITLE" | sed -nE 's/.*([0-9]+\.[0-9]+\.[0-9]+(\.post[0-9]+)?).*/\1/p' || true)
           if [ -z "$VERSION" ]; then

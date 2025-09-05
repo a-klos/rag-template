@@ -21,7 +21,6 @@ jobs:
 
       - name: Checkout release tag from triggering run
         run: |
-          set -euo pipefail
           git fetch --tags --force
           HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
           TAG=$(git tag --points-at "$HEAD_SHA" | head -n 1 || true)
@@ -61,12 +60,10 @@ jobs:
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: |
-          set -e
           python tools/bump_chart_versions.py --app-version "$APP_VERSION"
 
       - name: Package and push chart(s)
         run: |
-          set -e
           for chart in infrastructure/*/Chart.yaml; do
             chart_dir=$(dirname "$chart")
             helm dependency update "$chart_dir" || true

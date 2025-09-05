@@ -24,7 +24,6 @@ jobs:
       - name: Derive version from PR title (fallback to Chart appVersion)
         id: ver
         run: |
-          set -euo pipefail
           TITLE="${{ github.event.pull_request.title }}"
           VERSION=$(echo "$TITLE" | sed -nE 's/.*prepare ([0-9]+\.[0-9]+\.[0-9]+(\.post[0-9]+)?).*/\1/p' || true)
           if [ -z "$VERSION" ]; then
@@ -56,7 +55,6 @@ jobs:
           POETRY_HTTP_BASIC_TESTPYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_TESTPYPI_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
-          set -e
           for lib in libs/*; do
             [ -d "$lib" ] || continue
             echo "Publishing $lib"
@@ -98,7 +96,6 @@ jobs:
         env:
           VERSION: ${{ needs.publish.outputs.version }}
         run: |
-          set -e
           echo "Waiting for TestPyPI to index internal libs for version $VERSION"
           for name in admin-api-lib extractor-api-lib rag-core-api rag-core-lib; do
             echo "Checking $name==$VERSION"
@@ -128,9 +125,16 @@ jobs:
             fi
           done
 
+      - name: Clear poetry caches
+        run:
+
       - name: Refresh service lockfiles
         run: |
-          set -e
+          poetry cache clear --all pypi -n || true
+          poetry cache clear --all testpypi -n || true
+
+      - name: Refresh service lockfiles
+        run: |
           for svc in services/rag-backend services/admin-backend services/document-extractor services/mcp-server; do
             if [ -f "$svc/pyproject.toml" ]; then
               echo "Locking $svc"
