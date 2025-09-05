@@ -1,13 +1,12 @@
 name: publish-chart
 on:
-  workflow_dispatch: {}
-
   workflow_run:
-    workflows: [create-release]
+    workflows: [build-images]
     types: [completed]
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   packages: write
 
 jobs:
@@ -16,6 +15,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout release tag from triggering run
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          TAG=$(git tag --points-at "$HEAD_SHA" | head -n 1 || true)
+          if [ -z "$TAG" ]; then
+            TAG=$(git describe --tags --abbrev=0 "$HEAD_SHA" 2>/dev/null || true)
+          fi
+          if [ -z "$TAG" ]; then
+            echo "No tag found for triggering head_sha" >&2
+            exit 1
+          fi
+          git checkout "$TAG"
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+          echo "APP_VERSION=${TAG#v}" >> $GITHUB_ENV
+
+      - name: Expose app version
+        id: meta
+        run: |
+          echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Setup Helm
         uses: azure/setup-helm@v4
@@ -24,14 +47,47 @@ jobs:
         run: echo ${{ secrets.GHCR_PAT }} | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Package and push chart(s)
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
         run: |
           set -e
           for chart in infrastructure/*/Chart.yaml; do
             chart_dir=$(dirname "$chart")
             helm dependency update "$chart_dir" || true
-            helm package "$chart_dir" --destination .
+            helm package "$chart_dir" --destination . \
+              --app-version "$APP_VERSION" \
+              --version "$APP_VERSION"
           done
           for tgz in *.tgz; do
             name=$(basename "$tgz" .tgz)
             helm push "$tgz" oci://ghcr.io/${{ github.repository_owner }}/charts
           done
+
+      - name: Persist Chart.yaml version bumps and open PR
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
+        run: |
+          set -e
+          for chart in infrastructure/*/Chart.yaml; do
+            [ -f "$chart" ] || continue
+            CURR=$(awk '/^version:/ {print $2}' "$chart" | tr -d '"' | tr -d "'")
+            if echo "$CURR" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+              CHART_VER=$(awk -F. '{printf "%d.%d.%d", $1,$2,$3+1}' <<< "$CURR")
+            else
+              CHART_VER="$APP_VERSION"
+            fi
+            awk -v appv="$APP_VERSION" 'BEGIN{FS=OFS=": "}$1=="appVersion"{$2=appv}1' "$chart" > "$chart.tmp" && mv "$chart.tmp" "$chart"
+            awk -v ver="$CHART_VER" 'BEGIN{FS=OFS=": "}$1=="version"{$2=ver}1' "$chart" > "$chart.tmp" && mv "$chart.tmp" "$chart"
+          done
+
+      - name: Create PR for chart version bumps
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/chart-bump-${{ steps.meta.outputs.app_version }}
+          title: "chore(release): bump chart versions to ${{ steps.meta.outputs.app_version }}"
+          body: |
+            Persist Chart.yaml appVersion/version to match release ${{ steps.meta.outputs.app_version }}.
+          commit-message: "chore(release): bump charts to ${{ steps.meta.outputs.app_version }}"
+          add-paths: |
+            infrastructure/**/Chart.yaml
+          labels: chart-bump
