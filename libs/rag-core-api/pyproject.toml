@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "rag-core-api"
-version = "2.0.0.post20250905114954"
+version = "2.0.0.post20250905120223"
 description = "Contains default implementation for the RAG. It manages the communication with the knowledge base and how the answers are generated."
 authors = ["STACKIT Data and AI Consulting <data-ai-consulting@stackit.cloud>"]
 packages = [{ include = "rag_core_api", from = "src" }]
