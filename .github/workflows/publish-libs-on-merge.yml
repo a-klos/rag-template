@@ -1,11 +1,8 @@
 name: publish-libs-on-merge
 on:
-  workflow_dispatch: {}
-
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - '.version'
+    types: [closed]
 
 permissions:
   contents: write
@@ -15,14 +12,30 @@ permissions:
 
 jobs:
   publish:
+    if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'prepare-release') }}
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Read version
+      - name: Derive version from PR title (fallback to Chart appVersion)
         id: ver
         run: |
-          VERSION=$(cat .version)
+          set -euo pipefail
+          TITLE="${{ github.event.pull_request.title }}"
+          VERSION=$(echo "$TITLE" | sed -nE 's/.*prepare ([0-9]+\.[0-9]+\.[0-9]+(\.post[0-9]+)?).*/\1/p' || true)
+          if [ -z "$VERSION" ]; then
+            if [ -f infrastructure/rag/Chart.yaml ]; then
+              VERSION=$(grep -E '^appVersion:' infrastructure/rag/Chart.yaml | awk '{print $2}' | tr -d '"' | tr -d "'") || true
+            fi
+          fi
+          if [ -z "$VERSION" ]; then
+            echo "Could not derive version from PR title or Chart.yaml" >&2
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Setup Python
@@ -71,9 +84,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Wait for TestPyPI indexing
+        env:
+          VERSION: ${{ needs.publish.outputs.version }}
         run: |
           set -e
-          VERSION="$(cat .version)"
           echo "Waiting for TestPyPI to index internal libs for version $VERSION"
           for name in admin-api-lib extractor-api-lib rag-core-api rag-core-lib; do
             echo "Checking $name==$VERSION"
@@ -126,14 +140,11 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: chore/refresh-locks-${{ github.run_number }}
-          title: "chore(release): refresh service lockfiles"
+          branch: chore/refresh-locks-${{ needs.publish.outputs.version }}-${{ github.run_number }}
+          title: "chore(release): refresh service lockfiles for ${{ needs.publish.outputs.version }}"
           body: |
-            Refresh service poetry.lock files after publishing libs.
+            Refresh service poetry.lock files after publishing libs for version ${{ needs.publish.outputs.version }}.
           commit-message: "chore(release): refresh service lockfiles"
           add-paths: |
             services/**/poetry.lock
           labels: refresh-locks
-
-      - name: PR URL
-        run: 'echo "PR created: ${{ steps.cpr.outputs.pull-request-url }}"'

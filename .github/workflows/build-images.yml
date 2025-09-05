@@ -1,10 +1,8 @@
 name: build-images
 on:
-  workflow_dispatch: {}
-
-  pull_request_target:
-    types: [closed]
-    branches: [main]
+  workflow_run:
+    workflows: [create-release]
+    types: [completed]
 
 permissions:
   contents: read
@@ -12,32 +10,44 @@ permissions:
 
 jobs:
   build:
-    # Run ONLY when:
-    # - the PR was merged
-    # - it was your auto-PR (branch starts with chore/refresh-locks-)
-    # - and it has the "refresh-locks" label added in action1
-    if: >-
-      ${{
-        github.event.pull_request.merged == true &&
-        startsWith(github.event.pull_request.head.ref, 'chore/refresh-locks-') &&
-        contains(github.event.pull_request.labels.*.name, 'refresh-locks')
-      }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
       IMAGE_NS: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
-        # Build exactly the merged commit
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Checkout latest release tag (from triggering run)
+        id: release_tag
+        run: |
+          set -e
+          git fetch --tags --force
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          # Prefer a tag that points exactly at the triggering commit
+          TAG=$(git tag --points-at "$HEAD_SHA" | head -n 1 || true)
+          # Fallback to nearest tag reachable from the commit
+          if [ -z "$TAG" ]; then
+            TAG=$(git describe --tags --abbrev=0 "$HEAD_SHA" 2>/dev/null || true)
+          fi
+          # Fallback to latest semver-ish tag if still empty
+          if [ -z "$TAG" ]; then
+            TAG=$(git tag -l --sort=-v:refname | head -n 1 || true)
+          fi
+          if [ -z "$TAG" ]; then
+            echo "No Git tag found to check out" >&2
+            exit 1
+          fi
+          echo "Checking out tag $TAG"
+          git checkout "$TAG"
+          VER_NO_V="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VER_NO_V" >> $GITHUB_OUTPUT
 
       - name: Normalize IMAGE_NS to lowercase
         run: echo "IMAGE_NS=$(echo '${{ env.IMAGE_NS }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Read version
-        id: ver
-        run: echo "version=$(cat .version)" >> $GITHUB_OUTPUT
 
       - name: Setup Node (for frontend context)
         uses: actions/setup-node@v4
@@ -61,7 +71,7 @@ jobs:
       - name: Build and push images
         run: |
           set -e
-          VERSION="${{ steps.ver.outputs.version }}"
+          VERSION="${{ steps.release_tag.outputs.version }}"
           docker buildx build --push -t "$REGISTRY/$IMAGE_NS/rag-backend:${VERSION}" -f services/rag-backend/Dockerfile .
           docker buildx build --push -t "$REGISTRY/$IMAGE_NS/admin-backend:${VERSION}" -f services/admin-backend/Dockerfile .
           docker buildx build --push -t "$REGISTRY/$IMAGE_NS/document-extractor:${VERSION}" -f services/document-extractor/Dockerfile .
@@ -74,7 +84,7 @@ jobs:
 
       - name: Capture image digests
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
+          VERSION="${{ steps.release_tag.outputs.version }}"
           : > image-digests.json
           for ref in \
             "$REGISTRY/$IMAGE_NS/rag-backend:${VERSION}" \

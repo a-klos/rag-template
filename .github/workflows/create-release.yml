@@ -1,25 +1,36 @@
 name: create-release
 on:
-  workflow_dispatch: {}
-
-  workflow_run:
-    workflows: [build-images]
-    types: [completed]
+  pull_request_target:
+    types: [closed]
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: >-
+      ${{
+        github.event.pull_request.merged == true &&
+        contains(github.event.pull_request.labels.*.name, 'refresh-locks')
+      }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Read version
+      - name: Derive version from PR title
         id: ver
         run: |
-          echo "version=$(cat .version)" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          TITLE="${{ github.event.pull_request.title }}"
+          VERSION=$(echo "$TITLE" | sed -nE 's/.*([0-9]+\.[0-9]+\.[0-9]+(\.post[0-9]+)?).*/\1/p' || true)
+          if [ -z "$VERSION" ]; then
+            echo "Could not extract version from PR title: $TITLE" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Git tag
         run: |
@@ -31,6 +42,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-            tag_name: v${{ steps.ver.outputs.version }}
-            name: v${{ steps.ver.outputs.version }}
-            generate_release_notes: true
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: v${{ steps.ver.outputs.version }}
+          generate_release_notes: true
