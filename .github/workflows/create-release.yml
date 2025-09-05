@@ -44,3 +44,4 @@ jobs:
           tag_name: v${{ steps.ver.outputs.version }}
           name: v${{ steps.ver.outputs.version }}
           generate_release_notes: true
+          token: ${{ secrets.REPO_PAT }}
