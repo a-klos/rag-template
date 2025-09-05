@@ -59,9 +59,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "tomlkit==0.13.3" "pyyaml==6.0.2" "packaging==25.0"
 
-      - name: Bump libs and service pins
+      - name: Bump internal libs only (no service pins)
         run: |
-          python tools/bump_pyproject_deps.py --version "${{ steps.semrel.outputs.version }}"
+          python tools/bump_pyproject_deps.py --version "${{ steps.semrel.outputs.version }}" --bump-libs
 
       - name: Commit and open PR
         uses: peter-evans/create-pull-request@v6
@@ -70,9 +70,8 @@ jobs:
           title: "chore(release): prepare ${{ steps.semrel.outputs.version }}"
           body: |
             Prepare release ${{ steps.semrel.outputs.version }}
-            - bump libs and service pins
+            - bump internal libs versions only
           commit-message: "chore(release): prepare ${{ steps.semrel.outputs.version }}"
           add-paths: |
             libs/**/pyproject.toml
-            services/**/pyproject.toml
           labels: prepare-release

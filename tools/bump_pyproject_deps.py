@@ -10,17 +10,15 @@ from tomlkit.items import Table
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
-LIBS = [
+# Only bump versions for internal libs here
+LIBS_VERSION_FILES = [
     ROOT / 'libs' / 'rag-core-lib' / 'pyproject.toml',
     ROOT / 'libs' / 'rag-core-api' / 'pyproject.toml',
     ROOT / 'libs' / 'admin-api-lib' / 'pyproject.toml',
     ROOT / 'libs' / 'extractor-api-lib' / 'pyproject.toml',
-    ROOT / "services" / "admin-backend" / "pyproject.toml",
-    ROOT / "services" / "rag-backend" / "pyproject.toml",
-    ROOT / "services" / "document-extractor" / "pyproject.toml",
-    ROOT / "services" / "mcp-server" / "pyproject.toml",
 ]
 
+# Service pins to update after libs are published
 SERVICE_PINS = {
     ROOT / 'services' / 'rag-backend' / 'pyproject.toml': {
         'tool.poetry.group.prod.dependencies.rag-core-api': '=={v}',
@@ -68,41 +66,50 @@ def _get_table(doc: tomlkit.TOMLDocument, path: List[str]) -> Optional[Any]:
     return ref
 
 
-def bump(version: str):
+def bump(version: str, bump_libs: bool = True, bump_service_pins: bool = True):
     # 1) bump libs versions (textual, non-destructive)
-    for file in LIBS:
-        txt = file.read_text()
-        new_txt = replace_version_line(txt, version)
-        file.write_text(new_txt)
-        print(f"Updated {file} -> tool.poetry.version = {version}")
+    if bump_libs:
+        for file in LIBS_VERSION_FILES:
+            txt = file.read_text()
+            new_txt = replace_version_line(txt, version)
+            file.write_text(new_txt)
+            print(f"Updated {file} -> tool.poetry.version = {version}")
 
     # 2) bump service pins only inside [tool.poetry.group.prod.dependencies]
-    for file, mapping in SERVICE_PINS.items():
-        txt = file.read_text()
-        doc = tomlkit.parse(txt)
-        deps = _get_table(doc, [
-            'tool', 'poetry', 'group', 'prod', 'dependencies'
-        ])
-        if deps is None or not hasattr(deps, '__contains__'):
-            print(f"Skip {file}: prod dependencies table not found")
+    if bump_service_pins:
+        for file, mapping in SERVICE_PINS.items():
+            txt = file.read_text()
+            doc = tomlkit.parse(txt)
+            deps = _get_table(doc, [
+                'tool', 'poetry', 'group', 'prod', 'dependencies'
+            ])
+            if deps is None or not hasattr(deps, '__contains__'):
+                print(f"Skip {file}: prod dependencies table not found")
+                file.write_text(tomlkit.dumps(doc))
+                continue
+            for dotted, template in mapping.items():
+                pkg = dotted.split('.')[-1]
+                if pkg in deps:
+                    val = template.format(v=version)
+                    deps[pkg] = val
+                    print(f"Pinned {file} -> {pkg} = {val}")
+                else:
+                    print(f"Skip {file}: {pkg} not present in prod dependencies")
             file.write_text(tomlkit.dumps(doc))
-            continue
-        for dotted, template in mapping.items():
-            pkg = dotted.split('.')[-1]
-            if pkg in deps:
-                val = template.format(v=version)
-                deps[pkg] = val
-                print(f"Pinned {file} -> {pkg} = {val}")
-            else:
-                print(f"Skip {file}: {pkg} not present in prod dependencies")
-        file.write_text(tomlkit.dumps(doc))
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--version', required=True)
+    ap.add_argument('--bump-libs', action='store_true', help='Bump versions in internal libs only')
+    ap.add_argument('--bump-service-pins', action='store_true', help='Bump service dependency pins only')
     args = ap.parse_args()
-    bump(args.version)
+
+    # Backward compatibility: if neither flag is provided, do both
+    bump_libs = args.bump_libs or (not args.bump_libs and not args.bump_service_pins)
+    bump_service_pins = args.bump_service_pins or (not args.bump_libs and not args.bump_service_pins)
+
+    bump(args.version, bump_libs=bump_libs, bump_service_pins=bump_service_pins)
 
 
 if __name__ == '__main__':
