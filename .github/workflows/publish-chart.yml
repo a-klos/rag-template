@@ -46,47 +46,34 @@ jobs:
       - name: Login to GHCR for Helm OCI
         run: echo ${{ secrets.GHCR_PAT }} | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Package and push chart(s)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install bump script deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "pyyaml==6.0.2" "packaging==25.0"
+
+      - name: Bump Chart.yaml in working copy
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
+        run: |
+          set -e
+          python tools/bump_chart_versions.py --app-version "$APP_VERSION"
+
+      - name: Package and push chart(s)
         run: |
           set -e
           for chart in infrastructure/*/Chart.yaml; do
             chart_dir=$(dirname "$chart")
-            # Compute a valid SemVer for chart version by bumping current patch
-            CURR=$(awk '/^version:/ {print $2}' "$chart" | tr -d '"' | tr -d "'")
-            if echo "$CURR" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-              CHART_VER=$(awk -F. '{printf "%d.%d.%d", $1,$2,$3+1}' <<< "$CURR")
-            else
-              # Fallback to 0.1.0 if current version is not SemVer
-              CHART_VER="0.1.0"
-            fi
-            echo "Packaging $(basename "$chart_dir") with chart version ${CHART_VER} and appVersion ${APP_VERSION}"
             helm dependency update "$chart_dir" || true
-            helm package "$chart_dir" --destination . \
-              --app-version "$APP_VERSION" \
-              --version "$CHART_VER"
+            helm package "$chart_dir" --destination .
           done
           for tgz in *.tgz; do
             name=$(basename "$tgz" .tgz)
             helm push "$tgz" oci://ghcr.io/${{ github.repository_owner }}/charts
-          done
-
-      - name: Persist Chart.yaml version bumps and open PR
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: |
-          set -e
-          for chart in infrastructure/*/Chart.yaml; do
-            [ -f "$chart" ] || continue
-            CURR=$(awk '/^version:/ {print $2}' "$chart" | tr -d '"' | tr -d "'")
-            if echo "$CURR" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-              CHART_VER=$(awk -F. '{printf "%d.%d.%d", $1,$2,$3+1}' <<< "$CURR")
-            else
-              CHART_VER="0.1.0"
-            fi
-            awk -v appv="$APP_VERSION" 'BEGIN{FS=OFS=": "}$1=="appVersion"{$2=appv}1' "$chart" > "$chart.tmp" && mv "$chart.tmp" "$chart"
-            awk -v ver="$CHART_VER" 'BEGIN{FS=OFS=": "}$1=="version"{$2=ver}1' "$chart" > "$chart.tmp" && mv "$chart.tmp" "$chart"
           done
 
       - name: Create PR for chart version bumps
