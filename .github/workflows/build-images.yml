@@ -23,7 +23,6 @@ jobs:
       - name: Checkout release tag
         id: release_tag
         run: |
-          set -euo pipefail
           git fetch --tags --force
           TAG="${{ github.event.release.tag_name }}"
           if [ -z "$TAG" ]; then
@@ -60,7 +59,6 @@ jobs:
 
       - name: Build and push images
         run: |
-          set -e
           VERSION="${{ steps.release_tag.outputs.version }}"
           docker buildx build --push -t "$REGISTRY/$IMAGE_NS/rag-backend:${VERSION}" -f services/rag-backend/Dockerfile .
           docker buildx build --push -t "$REGISTRY/$IMAGE_NS/admin-backend:${VERSION}" -f services/admin-backend/Dockerfile .
