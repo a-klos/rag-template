@@ -4056,14 +4056,14 @@ fastembed-gpu = ["fastembed-gpu (>=0.7,<0.8)"]
 
 [[package]]
 name = "rag-core-api"
-version = "2.0.0.post20250905134051"
+version = "2.0.0.post20250905134844"
 description = "Contains default implementation for the RAG. It manages the communication with the knowledge base and how the answers are generated."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_api-2.0.0.post20250905134051-py3-none-any.whl", hash = "sha256:36f27b87573d4d83ecd391f39f31ad12eb6087f4bb3b2c0437fd8e044b7cfeb4"},
-    {file = "rag_core_api-2.0.0.post20250905134051.tar.gz", hash = "sha256:ea6ee58a6a78adba73e11acbf1bbace9b1913cd4f46ecf3884cd2c8c8cb7d01b"},
+    {file = "rag_core_api-2.0.0.post20250905134844-py3-none-any.whl", hash = "sha256:1744d9006def3eeecc4ea3cdffb9056f939597379d1a6507f77a1702e96eeee4"},
+    {file = "rag_core_api-2.0.0.post20250905134844.tar.gz", hash = "sha256:c1ce65d3d17edb3cdd4341cab28191033aa01ebec365c0c614841040aa056ff9"},
 ]
 
 [package.dependencies]
@@ -4095,14 +4095,14 @@ reference = "testpypi"
 
 [[package]]
 name = "rag-core-lib"
-version = "2.0.0.post20250905134051"
+version = "2.0.0.post20250905134844"
 description = "The core library for the RAG. It contains shared components and utilities for the RAG libs."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "rag_core_lib-2.0.0.post20250905134051-py3-none-any.whl", hash = "sha256:bac98b73564972d624334a183659240bfe9f94cf0f145fa335d4bd709ee90f5f"},
-    {file = "rag_core_lib-2.0.0.post20250905134051.tar.gz", hash = "sha256:05d18c8a97312d114d9c6b356e9633628fcf76fc7aebc792f2804cd5f928b395"},
+    {file = "rag_core_lib-2.0.0.post20250905134844-py3-none-any.whl", hash = "sha256:629113382e4de2d9241a03ed1994553f63a648fcbfaa5208223cb8673b0f3ede"},
+    {file = "rag_core_lib-2.0.0.post20250905134844.tar.gz", hash = "sha256:4557712b70a831c31e3a68e055d77d3ad6fb26dc86157c6de98b2f8e01a09eff"},
 ]
 
 [package.dependencies]
@@ -5226,4 +5226,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "2f0fa8eb6900106bba78dd1a8a7aaa31f3d5fb6da3c2200d55b96195d3f6aa33"
+content-hash = "2393cd8bf4ee51e11fc0f7f38a725498b7b0057e48c3183eb9a5e680b21816c7"
