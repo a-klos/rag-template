@@ -999,14 +999,14 @@ files = [
 
 [[package]]
 name = "extractor-api-lib"
-version = "2.0.0.post20250908084619"
+version = "2.0.0.post20250908085820"
 description = "Extracts the content of documents, websites, etc and maps it to a common format."
 optional = false
 python-versions = ">=3.13,<4.0"
 groups = ["prod"]
 files = [
-    {file = "extractor_api_lib-2.0.0.post20250908084619-py3-none-any.whl", hash = "sha256:00834cb701b54a083617f0b609bd62e3eb4bd57536d7ada42dbf8546478f60dd"},
-    {file = "extractor_api_lib-2.0.0.post20250908084619.tar.gz", hash = "sha256:c82edc65ff50d3038b671156f76c578beb317090e76cfcfc772557db7c4b9a20"},
+    {file = "extractor_api_lib-2.0.0.post20250908085820-py3-none-any.whl", hash = "sha256:9331a32d276ec95a7efbafb1ee95eaeb228a3b3bf16bcfa42466ab2a44e130d7"},
+    {file = "extractor_api_lib-2.0.0.post20250908085820.tar.gz", hash = "sha256:3ee95f30977883831589e03106ea99b675bf0f4cc22ab530c265d1718360038c"},
 ]
 
 [package.dependencies]
@@ -4980,4 +4980,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "9c72efa0e2b2747e424e255e3015af166c8b133bcb8bf8f2a8d8f2da0359e1b6"
+content-hash = "ad6f1a78cb8b01dd9c0db29e3bce7db2acd96be0605a76853d5a069cf125d930"
