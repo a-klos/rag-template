@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lock-${{ matrix.service }}
-          path: services/${{ matrix.service }}
+          path: services/${{ matrix.service }}/poetry.lock
 
   open-pr:
     needs: [lock-service, derive]
