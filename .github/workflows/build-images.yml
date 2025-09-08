@@ -87,6 +87,7 @@ jobs:
         run: |
           docker buildx build --push \
             -t "$REGISTRY/$IMAGE_NS/${{ matrix.name }}:${VERSION}" \
+            -t "$REGISTRY/$IMAGE_NS/${{ matrix.name }}:latest" \
             -f "${{ matrix.dockerfile }}" .
       - name: Capture digest
         run: |

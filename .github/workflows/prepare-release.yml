@@ -19,7 +19,8 @@ jobs:
       ${{
         github.event.pull_request.merged &&
         !contains(github.event.pull_request.labels.*.name, 'prepare-release') &&
-        !contains(github.event.pull_request.labels.*.name, 'refresh-locks')
+        !contains(github.event.pull_request.labels.*.name, 'refresh-locks') &&
+        !contains(github.event.pull_request.labels.*.name, 'chart-bump')
       }}
     runs-on: ubuntu-latest
     steps:
