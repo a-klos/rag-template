@@ -71,21 +71,25 @@ jobs:
         run: |
           python tools/bump_chart_versions.py --app-version "$APP_VERSION"
 
-      - name: Package and push chart(s)
+      - name: Package and push rag chart
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
         run: |
-          set -e
+          set -euo pipefail
+          export HELM_EXPERIMENTAL_OCI=1
           CHART_DIR="infrastructure/rag"
           if [ ! -f "$CHART_DIR/Chart.yaml" ]; then
             echo "Expected chart at $CHART_DIR/Chart.yaml not found" >&2
             exit 1
           fi
           mkdir -p dist
-          echo "Processing $CHART_DIR"
+          echo "Packaging $CHART_DIR for version $APP_VERSION"
           helm dependency update "$CHART_DIR" || true
           helm package "$CHART_DIR" --destination dist
-          for tgz in dist/*.tgz; do
-            helm push "$tgz" oci://ghcr.io/${{ github.repository_owner }}/charts
-          done
+          PKG=$(ls dist/*.tgz)
+          echo "Packaged chart: $PKG"
+          helm show chart "$PKG" | grep -E "^version: "
+          helm push "$PKG" oci://ghcr.io/${{ github.repository_owner }}/charts
 
       - name: Create PR for chart version bumps
         uses: peter-evans/create-pull-request@v6
