@@ -98,5 +98,5 @@ url = "https://test.pypi.org/simple/"
 priority = "supplemental"
 
 [tool.poetry.group.prod.dependencies]
-admin-api-lib = "==2.0.0.post20250905134844"
-rag-core-lib = "==2.0.0.post20250905134844"
+admin-api-lib = "==2.0.0.post20250908054249"
+rag-core-lib = "==2.0.0.post20250908054249"
