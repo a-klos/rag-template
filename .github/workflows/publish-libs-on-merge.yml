@@ -97,7 +97,7 @@ jobs:
             fi
             sleep 5
           done
-          echo "Error: ${{ matrix.lib }}==$VERSION not visible on TestPyPI" >&2
+          echo "Error: ${{ matrix.lib }}==$VERSION" >&2
           exit 1
 
   lock-service:
@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lock-${{ matrix.service }}
-          path: services/${{ matrix.service }}/poetry.lock
+          path: services/${{ matrix.service }}
 
   open-pr:
     needs: [lock-service, derive]
@@ -157,6 +157,10 @@ jobs:
         with:
           pattern: lock-*
           merge-multiple: true
+      - name: Show downloaded lockfiles
+        run: |
+          ls -R services | head -100 || true
+          git status --short || true
       - name: Re-run service pin bump (ensure pyproject reflects version)
         run: |
           python -m pip install --upgrade pip
