@@ -1,7 +1,6 @@
 name: publish-chart
 run-name: publish-chart (post-build-images)
 on:
-  workflow_dispatch:
   workflow_run:
     workflows: [build-images]
     types: [completed]
@@ -13,7 +12,7 @@ permissions:
 
 jobs:
   chart:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} or ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,10 +28,6 @@ jobs:
             if [ -z "$TAG" ]; then
               TAG=$(git describe --tags --abbrev=0 "$HEAD_SHA" 2>/dev/null || true)
             fi
-          else
-            # Manual dispatch: fall back to latest tag
-            TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
-          fi
           if [ -z "$TAG" ]; then
             echo "No tag found (head_sha=$HEAD_SHA)" >&2
             exit 1
@@ -79,11 +74,9 @@ jobs:
             exit 1
           fi
           mkdir -p dist
-          echo "Packaging $CHART_DIR for version $APP_VERSION"
           helm dependency update "$CHART_DIR" || true
           helm package "$CHART_DIR" --destination dist
           PKG=$(ls dist/*.tgz)
-          echo "Packaged chart: $PKG"
           helm show chart "$PKG" | grep -E "^version: "
           helm push "$PKG" oci://ghcr.io/${{ github.repository_owner }}/charts
 
