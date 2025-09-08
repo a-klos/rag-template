@@ -21,18 +21,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Derive version from PR title (fallback to Chart appVersion)
+      - name: Derive version from PR title
         id: ver
         run: |
           TITLE="${{ github.event.pull_request.title }}"
           VERSION=$(echo "$TITLE" | sed -nE 's/.*prepare ([0-9]+\.[0-9]+\.[0-9]+(\.post[0-9]+)?).*/\1/p' || true)
           if [ -z "$VERSION" ]; then
-            if [ -f infrastructure/rag/Chart.yaml ]; then
-              VERSION=$(grep -E '^appVersion:' infrastructure/rag/Chart.yaml | awk '{print $2}' | tr -d '"' | tr -d "'") || true
-            fi
-          fi
-          if [ -z "$VERSION" ]; then
-            echo "Could not derive version from PR title or Chart.yaml" >&2
+            echo "Could not derive version from PR title" >&2
             exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -44,10 +39,10 @@ jobs:
       - name: Install Poetry
         run: |
           pip install poetry==2.1.3
-      - name: Configure TestPyPI repository
+      - name: Configure TestPyPI repository #TODO: should be pypi later.
         run: |
           poetry config repositories.testpypi https://test.pypi.org/legacy/
-      - name: Build and publish libs to TestPyPI
+      - name: Build and publish libs to TestPyPI #TODO: if STACKIT org is created, the gha should be authorized, no token necessary anymore!
         env:
           POETRY_HTTP_BASIC_TESTPYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_TESTPYPI_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
@@ -118,12 +113,10 @@ jobs:
             fi
           done
       - name: Clear poetry caches
-        run:
-
-      - name: Refresh service lockfiles
         run: |
           poetry cache clear --all pypi -n || true
           poetry cache clear --all testpypi -n || true
+
       - name: Refresh service lockfiles
         run: |
           for svc in services/rag-backend services/admin-backend services/document-extractor services/mcp-server; do
