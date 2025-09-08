@@ -24,13 +24,17 @@ jobs:
         run: |
           git fetch --tags --force
           HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
-          TAG=$(git tag --points-at "$HEAD_SHA" | head -n 1 || true)
-          if [ -z "$TAG" ]; then
-            TAG=$(git describe --tags --abbrev=0 "$HEAD_SHA" 2>/dev/null || true)
+          if [ -n "$HEAD_SHA" ]; then
+            TAG=$(git tag --points-at "$HEAD_SHA" | head -n 1 || true)
+            if [ -z "$TAG" ]; then
+              TAG=$(git describe --tags --abbrev=0 "$HEAD_SHA" 2>/dev/null || true)
+            fi
+          else
+            # Manual dispatch: fall back to latest tag
+            TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
           fi
-            
           if [ -z "$TAG" ]; then
-            echo "No tag found for triggering head_sha" >&2
+            echo "No tag found (head_sha=$HEAD_SHA)" >&2
             exit 1
           fi
           git checkout "$TAG"
@@ -41,6 +45,10 @@ jobs:
         id: meta
         run: echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
 
+      - name: Create branch for chart bump
+        run: |
+          git checkout -b chore/chart-bump-${APP_VERSION}
+
       - name: Setup Helm
         uses: azure/setup-helm@v4
 
@@ -50,14 +58,14 @@ jobs:
       - name: Setup Python (for bump script)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+            python-version: '3.13'
 
       - name: Install bump script deps
         run: |
           python -m pip install --upgrade pip
           python -m pip install "pyyaml==6.0.2" "packaging==25.0"
 
-      - name: Bump Chart.yaml for packaging (detached tag)
+      - name: Bump Chart.yaml (set release version)
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: |
@@ -65,26 +73,10 @@ jobs:
 
       - name: Package and push chart(s)
         run: |
-          for chart in infrastructure/*/Chart.yaml; do
-            chart_dir=$(dirname "$chart")
-            helm dependency update "$chart_dir" || true
-            helm package "$chart_dir" --destination .
-          done
-          for tgz in *.tgz; do
-            name=$(basename "$tgz" .tgz)
-            helm push "$tgz" oci://ghcr.io/${{ github.repository_owner }}/charts
-          done
-
-      - name: Switch to main for PR changes
-        run: |
-          git fetch origin main
-          git checkout origin/main
-
-      - name: Bump Chart.yaml on main (persist)
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: |
-          python tools/bump_chart_versions.py --app-version "$APP_VERSION"
+          chart_dir="infrastructure/rag/Chart.yaml"
+          helm dependency update "$chart_dir" || true
+          helm package "$chart_dir" --destination .1
+          helm push .1/*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
 
       - name: Create PR for chart version bumps
         uses: peter-evans/create-pull-request@v6
