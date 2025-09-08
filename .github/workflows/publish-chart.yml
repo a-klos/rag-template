@@ -45,9 +45,10 @@ jobs:
         id: meta
         run: echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Create branch for chart bump
-        run: |
-          git checkout -b chore/chart-bump-${APP_VERSION}
+      # Removed manual branch creation; create-pull-request will create the branch from current HEAD
+      # - name: Create branch for chart bump
+      #   run: |
+      #     git checkout -b chore/chart-bump-${APP_VERSION}
 
       - name: Setup Helm
         uses: azure/setup-helm@v4
