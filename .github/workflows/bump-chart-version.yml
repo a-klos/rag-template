@@ -56,4 +56,4 @@ jobs:
           add-paths: |
             infrastructure/**/Chart.yaml
           token: ${{ secrets.PR_AUTOMATION_TOKEN }}
-          labels: chart-bump
+

@@ -1,6 +1,6 @@
 # Openapi generator files
 .openapi-generator
-
+awdada
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,7 +8,7 @@ __pycache__/
 *.pyc
 # C extensions
 *.so
-
+awdawdwa
 # Distribution / packaging
 .Python
 build/
