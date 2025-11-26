@@ -49,7 +49,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '25'
-
       - name: Install semantic-release deps
         run: npm ci
 
