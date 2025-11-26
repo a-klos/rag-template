@@ -21,7 +21,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PR_AUTOMATION_TOKEN }}
 
-
       - name: Derive version from PR title
         id: ver
         run: |
