@@ -2,7 +2,7 @@ flake8_dashboard/
 
 # Openapi generator files
 .openapi-generator
-
+#
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
