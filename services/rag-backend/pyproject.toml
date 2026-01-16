@@ -113,9 +113,11 @@ url = "https://test.pypi.org/simple/"
 priority = "supplemental"
 
 
+
 [tool.poetry.group.prod.dependencies]
-rag-core-api = "==3.4.0"
-rag-core-lib = "==3.4.0"
+rag-core-api = "==3.5.1009"
+rag-core-lib = "==3.5.1009"
+
 
 [tool.poetry.group.prod-local.dependencies]
 # Use local path for Tilt/development with production Dockerfile
