@@ -9,7 +9,7 @@ description: 'This helm chart deploys a front- and backend microservice. Togethe
 
   '
 type: application
-version: 3.4.0
+version: 3.5.1009
 appVersion: v3.5.1009
 dependencies:
 - name: langfuse
