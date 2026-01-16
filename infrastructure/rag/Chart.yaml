@@ -1,29 +1,33 @@
 apiVersion: v2
 name: rag
-description: |
-  This helm chart deploys a front- and backend microservice. Together, those components
+description: 'This helm chart deploys a front- and backend microservice. Together,
+  those components
+
   form rag. rag is an application, where you can upload your own documents and
+
   ask question about their content and the rag will answer them.
+
+  '
 type: application
-version: 3.4.0
-appVersion: "v3.4.0"
+version: 3.5.1008
+appVersion: v3.4.0
 dependencies:
 - name: langfuse
   repository: https://langfuse.github.io/langfuse-k8s
-  version: "1.5.4"
+  version: 1.5.4
   condition: features.langfuse.enabled
 - name: qdrant
   version: 1.15.5
-  repository: "https://qdrant.github.io/qdrant-helm"
+  repository: https://qdrant.github.io/qdrant-helm
   condition: features.qdrant.enabled
 - name: minio
   repository: https://charts.bitnami.com/bitnami
-  version: "15.0.7"
+  version: 15.0.7
   condition: features.minio.enabled
 - name: keydb
   alias: keydb
   repository: https://enapter.github.io/charts/
-  version: "0.48.0"
+  version: 0.48.0
   condition: features.keydb.enabled
 - name: ollama
   alias: ollama
