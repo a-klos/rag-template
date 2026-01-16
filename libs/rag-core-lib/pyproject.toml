@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "rag-core-lib"
-version = "v3.4.0"
+version = "3.5.1008"
 description = "The rag-core-lib contains the shared components of at least two of the rag libs."
 authors = [
     "STACKIT GmbH & Co. KG <data-ai@stackit.cloud>",
@@ -67,6 +67,11 @@ flake8-docstrings = "^1.7.0"
 [tool.poetry.group.dev.dependencies]
 debugpy = "^1.8.14"
 
+
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"
 
 [tool.flake8]
 exclude= [".eggs", ".git", ".hg", ".mypy_cache", ".tox", ".venv", ".devcontainer", "venv", "_build", "buck-out", "build", "dist", "**/__init__.py"]
