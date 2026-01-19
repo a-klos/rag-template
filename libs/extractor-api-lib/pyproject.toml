@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "extractor-api-lib"
-version = "3.5.0.post20260119054101"
+version = "3.5.1010"
 description = "Extracts the content of documents, websites, etc and maps it to a common format."
 authors = [
     "STACKIT GmbH & Co. KG <data-ai@stackit.cloud>",
@@ -23,58 +23,10 @@ name = "pytorch_cpu"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
 
-[tool.flake8]
-exclude = [".eggs", "./src/extractor_api_lib/models/*", ".git", ".hg", ".mypy_cache", ".tox", ".venv", ".devcontainer", "venv", "_build", "buck-out", "build", "dist", "**/__init__.py", "tests/test_data/generate_test_pdfs.py"]
-statistics = true
-show-source = false
-max-complexity = 10
-max-annotations-complexity = 3
-docstring-convent = 'numpy'
-max-line-length = 120
-ignore = ["E203", "W503", "E704"]
-inline-quotes = '"'
-docstring-quotes = '"""'
-multiline-quotes = '"""'
-dictionaries = ["en_US", "python", "technical", "pandas"]
-ban-relative-imports = true
-per-file-ignores = """
-  ./src/extractor_api_lib/apis/extractor_api.py: B008,WOT001,
-  ./src/extractor_api_lib/impl/extractor_api_impl.py: B008,
-  ./src/extractor_api_lib/container.py: CCE002,CCE001,
-  ./src/extractor_api_lib/apis/extractor_api_base.py: WOT001,
-  ./tests/*: S101,E501,
-  **/__init__.py: D107,
-"""
-
-[tool.black]
-line-length = 120
-exclude = """
-/(
-  |  .eggs
-  |  .git
-  |  .hg
-  |  .mypy_cache
-  |  .nox
-  |  .pants.d
-  |  .tox
-  |  .venv
-  |  _build
-  |  buck-out
-  |  build
-  |  dist
-  |  node_modules
-  |  venv
-)/
-"""
-
-[tool.isort]
-profile = "black"
-skip = ['.eggs', '.git', '.hg', '.mypy_cache', '.nox', '.pants.d', '.tox', '.venv', '_build', 'buck-out', 'build', 'dist', 'node_modules', 'venv']
-skip_gitignore = true
-known_local_folder = ["extractor_api_lib", "rag_core_lib"]
-
-[tool.pylint]
-max-line-length = 120
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"
 
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
@@ -154,6 +106,60 @@ flake8-docstrings = "^1.7.0"
 
 [tool.poetry.group.dev.dependencies]
 debugpy = "^1.8.14"
+
+
+[tool.flake8]
+exclude = [".eggs", "./src/extractor_api_lib/models/*", ".git", ".hg", ".mypy_cache", ".tox", ".venv", ".devcontainer", "venv", "_build", "buck-out", "build", "dist", "**/__init__.py", "tests/test_data/generate_test_pdfs.py"]
+statistics = true
+show-source = false
+max-complexity = 10
+max-annotations-complexity = 3
+docstring-convent = 'numpy'
+max-line-length = 120
+ignore = ["E203", "W503", "E704"]
+inline-quotes = '"'
+docstring-quotes = '"""'
+multiline-quotes = '"""'
+dictionaries = ["en_US", "python", "technical", "pandas"]
+ban-relative-imports = true
+per-file-ignores = """
+  ./src/extractor_api_lib/apis/extractor_api.py: B008,WOT001,
+  ./src/extractor_api_lib/impl/extractor_api_impl.py: B008,
+  ./src/extractor_api_lib/container.py: CCE002,CCE001,
+  ./src/extractor_api_lib/apis/extractor_api_base.py: WOT001,
+  ./tests/*: S101,E501,
+  **/__init__.py: D107,
+"""
+
+[tool.black]
+line-length = 120
+exclude = """
+/(
+  |  .eggs
+  |  .git
+  |  .hg
+  |  .mypy_cache
+  |  .nox
+  |  .pants.d
+  |  .tox
+  |  .venv
+  |  _build
+  |  buck-out
+  |  build
+  |  dist
+  |  node_modules
+  |  venv
+)/
+"""
+
+[tool.isort]
+profile = "black"
+skip = ['.eggs', '.git', '.hg', '.mypy_cache', '.nox', '.pants.d', '.tox', '.venv', '_build', 'buck-out', 'build', 'dist', 'node_modules', 'venv']
+skip_gitignore = true
+known_local_folder = ["extractor_api_lib", "rag_core_lib"]
+
+[tool.pylint]
+max-line-length = 120
 
 [tool.pytest.ini_options]
 log_cli = true
