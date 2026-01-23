@@ -1,20 +1,25 @@
-name: Release Charts
-
+name: publish-chart-packages
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
     inputs:
       chart_version:
-        description: "Chart version to publish (optional - will use Chart.yaml)"
+        description: "Chart version to publish (default: read from Chart.yaml)"
+        required: false
+        type: string
+      ref:
+        description: "Git ref to package from (default: main)"
         required: false
         type: string
 
 permissions:
   contents: write
-  packages: write
   pull-requests: read
+  packages: write
+
+env:
+  OCI_REGISTRY: ghcr.io
 
 jobs:
   gate:
@@ -24,7 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Allow manual run
         id: allow_manual
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -34,49 +38,91 @@ jobs:
         id: allow_push
         if: ${{ github.event_name == 'push' }}
         env:
-          GH_TOKEN: ${{ secrets.PR_AUTOMATION_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python tools/allow_chart_bump.py
 
-  release:
+  publish:
     needs: gate
-    if: ${{ needs.gate.outputs.allow == 'true' }}
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
+    if: ${{ needs.gate.outputs.allow == 'true' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.PR_AUTOMATION_TOKEN }}
+          ref: ${{ inputs.ref || 'main' }}
 
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Install Helm
+      - name: Setup Helm
         uses: azure/setup-helm@v4
 
-      - name: Add Helm repositories and update dependencies
+      - name: Login to GHCR for Helm OCI
+        run: printf "%s" "${{ secrets.PR_AUTOMATION_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Determine chart version
+        id: meta
         run: |
-          # Add all the repositories your chart depends on
-          helm repo add langfuse https://langfuse.github.io/langfuse-k8s
-          helm repo add qdrant https://qdrant.github.io/qdrant-helm
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add enapter https://enapter.github.io/charts/
-          helm repo add ollama https://otwld.github.io/ollama-helm/
-          helm repo update
+          set -euo pipefail
+          INPUT_VER="${{ inputs.chart_version }}"
+          FILE_VER=$(awk '/^version:/ {print $2}' infrastructure/rag/Chart.yaml | tr -d "\"'")
+          CHART_VERSION="${INPUT_VER:-$FILE_VER}"
+          if [ -z "$CHART_VERSION" ]; then
+            echo "Could not determine chart version" >&2
+            exit 1
+          fi
+          echo "chart_version=$CHART_VERSION" >> $GITHUB_OUTPUT
 
-          # Update dependencies for the rag chart
-          helm dependency update infrastructure/rag
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        with:
-          charts_dir: infrastructure/rag
-          skip_packaging: false
+      - name: Verify chart version matches input (if provided)
         env:
-          CR_TOKEN: "${{ secrets.PR_AUTOMATION_TOKEN }}"
-          CR_SKIP_EXISTING: true
+          INPUT_VER: ${{ inputs.chart_version }}
+          FILE_VER: ${{ steps.meta.outputs.chart_version }}
+        run: |
+          if [ -n "$INPUT_VER" ] && [ "$INPUT_VER" != "$FILE_VER" ]; then
+            echo "Chart.yaml version ($FILE_VER) does not match input $INPUT_VER" >&2
+            exit 1
+          fi
+
+      - name: Package chart
+        run: |
+          set -euo pipefail
+          CHART_DIR="infrastructure/rag"
+          mkdir -p dist
+          helm dependency update "$CHART_DIR" || true
+          helm package "$CHART_DIR" --destination dist
+          ls -la dist
+
+      - name: Push chart to GHCR (OCI)
+        env:
+          CHART_VERSION: ${{ steps.meta.outputs.chart_version }}
+        run: |
+          set -euo pipefail
+          PKG=$(ls dist/*.tgz)
+          helm show chart "$PKG" | grep -E "^version: "
+          helm push "$PKG" oci://$OCI_REGISTRY/${{ github.repository_owner }}/charts
+
+      - name: Build Helm repo index for gh-pages
+        env:
+          CHART_VERSION: ${{ steps.meta.outputs.chart_version }}
+        run: |
+          set -euo pipefail
+          PKG=$(ls dist/*.tgz)
+          REPO="${GITHUB_REPOSITORY#*/}"
+          BASE_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO}"
+          if git ls-remote --exit-code origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages:gh-pages
+            if git show gh-pages:index.yaml > dist/index.yaml 2>/dev/null; then
+              helm repo index dist --url "$BASE_URL" --merge dist/index.yaml
+            else
+              helm repo index dist --url "$BASE_URL"
+            fi
+          else
+            helm repo index dist --url "$BASE_URL"
+          fi
+          echo "Index generated for $BASE_URL"
+
+      - name: Publish Helm repo to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: dist
+          keep_files: true
