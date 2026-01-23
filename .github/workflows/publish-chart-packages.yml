@@ -119,10 +119,21 @@ jobs:
           fi
           echo "Index generated for $BASE_URL"
 
+      - name: Prepare files for gh-pages (root level)
+        env:
+            CHART_VERSION: ${{ steps.meta.outputs.chart_version }}
+        run: |
+            set -euo pipefail
+            # The dist folder should contain files at ROOT level for gh-pages
+            # Files are already in dist/, just verify
+            ls -la dist/
+            echo "Files ready for gh-pages root:"
+            ls -la dist/*.tgz dist/index.yaml
+
       - name: Publish Helm repo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: dist
-          keep_files: true
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_branch: gh-pages
+            publish_dir: dist
+            keep_files: true
