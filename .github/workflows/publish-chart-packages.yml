@@ -56,10 +56,27 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Add Helm repositories and update dependencies
+        run: |
+          # Add all the repositories your chart depends on
+          helm repo add langfuse https://langfuse.github.io/langfuse-k8s
+          helm repo add qdrant https://qdrant.github.io/qdrant-helm
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add enapter https://enapter.github.io/charts/
+          helm repo add ollama https://otwld.github.io/ollama-helm/
+          helm repo update
+
+          # Update dependencies for the rag chart
+          helm dependency update infrastructure/rag
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: infrastructure
+          skip_packaging: false
         env:
           CR_TOKEN: "${{ secrets.PR_AUTOMATION_TOKEN }}"
           CR_SKIP_EXISTING: true
